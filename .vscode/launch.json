@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Build and Launch Project_Isilon_2 Editor",
+            "type": "cppvsdbg",
+            "request": "launch",
+
+            "program": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Binaries\\Win64\\UnrealEditor.exe",
+
+            "args": [
+                "${workspaceFolder}\\Project_Isilon_2.uproject",
+                "-log"
+            ],
+
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+
+            "preLaunchTask": "Build Project_Isilon_2Editor"
+        }
+    ]
+}

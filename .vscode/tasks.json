@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Project_Isilon_2Editor",
+            "type": "shell",
+            "command": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Build\\BatchFiles\\Build.bat",
+            "args": [
+                "Project_Isilon_2Editor",
+                "Win64",
+                "Development",
+                "-Project=${workspaceFolder}\\Project_Isilon_2.uproject",
+                "-WaitMutex",
+                "-NoHotReloadFromIDE"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "shell": {
+                    "executable": "C:\\Windows\\System32\\cmd.exe",
+                    "args": [
+                        "/d",
+                        "/c"
+                    ]
+                }
+            },
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
