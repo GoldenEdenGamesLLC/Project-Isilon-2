@@ -546,9 +546,9 @@ void ACubeCharacter::OnInteractionSphereEndOverlap(UPrimitiveComponent *Overlapp
 	}
 }
 
-void ACubeCharacter::HandleInteractionOverlap(const FSphereInteractionParams& Parmas)
+void ACubeCharacter::HandleInteractionOverlap(const FSphereInteractionParams& Params)
 {
-
+	
 }
 
 void ACubeCharacter::ServerInteract_Implementation(AInteractableActor* Interactable)

@@ -3,6 +3,7 @@
 
 #include "InteractableActor.h"
 
+#include "Components/SphereComponent.h"
 #include "CubeCharacter.h"
 
 // Sets default values
@@ -12,6 +13,15 @@ AInteractableActor::AInteractableActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	bReplicates = true;
+
+	InteractionCollision = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionCollision"));
+
+	SetRootComponent(InteractionCollision);
+	InteractionCollision->SetSphereRadius(50.0f);
+	InteractionCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	InteractionCollision->SetCollisionObjectType(ECC_WorldDynamic);
+	InteractionCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
+	InteractionCollision->SetGenerateOverlapEvents(true);
 }
 
 // Called when the game starts or when spawned
@@ -28,7 +38,7 @@ void AInteractableActor::Tick(float DeltaTime)
 
 }
 
-void AInteractableActor::Interact(ACubeCharacter* InteractingPlayer)
+void AInteractableActor::Interact_Implementation(ACubeCharacter* InteractingPlayer)
 {
 	if(!HasAuthority())
 	{
@@ -36,4 +46,9 @@ void AInteractableActor::Interact(ACubeCharacter* InteractingPlayer)
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("%s interacted with %s"), *GetNameSafe(InteractingPlayer), *GetName());
+}
+
+void AInteractableActor::Interact(ACubeCharacter* InteractingPlayer)
+{
+
 }

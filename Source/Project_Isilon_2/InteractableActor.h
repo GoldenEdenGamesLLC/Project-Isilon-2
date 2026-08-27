@@ -7,6 +7,7 @@
 #include "InteractableActor.generated.h"
 
 class ACubeCharacter;
+class USphereComponent;
 
 UCLASS()
 class PROJECT_ISILON_2_API AInteractableActor : public AActor
@@ -21,9 +22,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
+	TObjectPtr<USphereComponent> InteractionCollision;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Interact(ACubeCharacter* InteractingPlayer);
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	void Interact(ACubeCharacter* InteractingPlayer);
+
+	virtual void Interact_Implementation(ACubeCharacter* InteractingPlayer);
 };

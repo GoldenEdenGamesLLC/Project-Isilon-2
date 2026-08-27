@@ -178,7 +178,7 @@ private:
 	void Look(const FInputActionValue& val);
 
 	// ===========================================
-	// Interaction - TODO::start from here
+	// Interaction
 	// ===========================================
 
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
