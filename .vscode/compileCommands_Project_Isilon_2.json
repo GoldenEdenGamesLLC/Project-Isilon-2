@@ -64,6 +64,14 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
 	},
 	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\InteractableActor.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Project_Isilon_2\\Project_Isilon_2.0.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
 		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\PlayerAnimInstance.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
@@ -73,14 +81,6 @@
 	},
 	{
 		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Project_Isilon_2.cpp",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Project_Isilon_2\\Project_Isilon_2.0.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
-	},
-	{
-		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\TestPawn.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Project_Isilon_2\\Project_Isilon_2.0.rsp"

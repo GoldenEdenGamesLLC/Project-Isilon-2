@@ -192,6 +192,8 @@ void AEnemyRangedCharacter::ActivateFromPool(const FVector& SpawnLocation, const
 		return;
 	}
 
+	// Get health based off of damage coefficient.
+	// RangedEnemyBaseHealth = ;
 	RangedEnemyCurrentHealth = RangedEnemyBaseHealth;
 
 	SetActorLocationAndRotation(SpawnLocation, SpawnRotation, false, nullptr, ETeleportType::TeleportPhysics);

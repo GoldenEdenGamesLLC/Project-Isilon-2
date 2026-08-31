@@ -127,6 +127,8 @@ void AEnemyCharacter::ActivateFromPool(const FVector& SpawnLocation, const FRota
 		return;
 	}
 
+	// Get health based off of damage coefficient.
+	// MeleeEnemyBaseHealth = ;
 	MeleeEnemyCurrentHealth = MeleeEnemyBaseHealth;
 
 	SetActorLocationAndRotation(SpawnLocation, SpawnRotation, false, nullptr, ETeleportType::TeleportPhysics);
