@@ -54,21 +54,27 @@ public:
 	}
 	
 protected:
+ 	// Easy, Medium, Hard
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Difficulty")
-	EGameDifficulty Difficulty = EGameDifficulty::Normal; // Easy, Medium, Hard
+	EGameDifficulty Difficulty = EGameDifficulty::Normal;
 
+	//damage received from enemies scaling
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Difficulty|Player")
 	float DamageReceivedCoefficient = 1.0f;
 
+	//damage dealt to enemies scaling
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Difficulty|Player")
 	float DamageDealtCoefficient = 1.0f;
 
+	//enemy health scaling
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Difficulty|Enemy")
 	float EnemyHealthCoefficient = 1.0f;
 
+	//enemy damage scaling
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Difficulty|Enemy")
 	float EnemyDamageCoefficient = 1.0f;
 
+	//possibly do to increase speed scaling? similar to zombies?
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Difficulty|Enemy")
 	float EnemySpeedCoefficient = 1.0f;
 

@@ -8,6 +8,7 @@
 
 class AController;
 class AEnemySpawner;
+class UEnemyAIStats;
 
 UCLASS()
 class PROJECT_ISILON_2_API AEnemyRangedCharacter : public ACharacter
@@ -30,8 +31,20 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_RangedEnemyCurrentHealth, VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	float RangedEnemyCurrentHealth = 80.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category="Stats")
+	float BaseDamage = 20.0f;
+
+	UPROPERTY(ReplicatedUsing = OnRep_MaxHealth, VisibleAnywhere, BlueprintReadOnly, Category="Stats")
+	float MaxHealth;
+	float Damage;
+
+	void ApplyDifficulty(const UEnemyAIStats* DifficultyStats, float RuntimeCoefficient);
+
 	UFUNCTION()
 	void OnRep_RangedEnemyCurrentHealth();
+	
+	UFUNCTION()
+	void OnRep_MaxHealth();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -54,7 +67,7 @@ public:
 	// ===========================================
 	// OBJECT POOLING
 	// ===========================================
-	void ActivateFromPool(const FVector& SpawnLocation, const FRotator& SpawnRotation);
+	void ActivateFromPool(const FVector& SpawnLocation, const FRotator& SpawnRotation, const UEnemyAIStats* DifficultyStats, float RuntimeCoefficient);
 
 	void DeactivateForPool();
 

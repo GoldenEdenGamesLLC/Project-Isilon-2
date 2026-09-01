@@ -4,6 +4,7 @@
 #include "EnemyRangedCharacter.h"
 #include "EnemyAIController.h"
 #include "EnemySpawner.h"
+#include "EnemyAIStats.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -127,7 +128,9 @@ float AEnemyRangedCharacter::TakeDamage(float DamageAmount, struct FDamageEvent 
 	}
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	RangedEnemyCurrentHealth -= ActualDamage;
+
+	RangedEnemyCurrentHealth = FMath::Clamp(RangedEnemyCurrentHealth - ActualDamage, 0.0f, MaxHealth);
+
 	UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), ActualDamage, RangedEnemyCurrentHealth);
 
 	if(RangedEnemyCurrentHealth <= 0.0f)
@@ -148,10 +151,15 @@ float AEnemyRangedCharacter::TakeDamage(float DamageAmount, struct FDamageEvent 
 
 void AEnemyRangedCharacter::OnRep_RangedEnemyCurrentHealth()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] %s health Updated: %.1f"), *GetName(), RangedEnemyCurrentHealth);
+	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] RangedEnemyCurrentHealth =  %s health Updated: %.1f"), *GetName(), RangedEnemyCurrentHealth);
 
 	//TODO:
 	//1. Hit Reaction (Knockback, hit reaction)
+}
+
+void AEnemyRangedCharacter::OnRep_MaxHealth()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] MaxHealth = %s health Updated: %.1f"), *GetName(), MaxHealth);
 }
 
 void AEnemyRangedCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -160,6 +168,7 @@ void AEnemyRangedCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 
 	DOREPLIFETIME(AEnemyRangedCharacter, RangedEnemyCurrentHealth);
 	DOREPLIFETIME(AEnemyRangedCharacter, bPoolActive);
+	DOREPLIFETIME(AEnemyRangedCharacter, MaxHealth);
 }
 
 //End Damage Taking Section
@@ -185,7 +194,7 @@ void AEnemyRangedCharacter::ApplyPoolState()
 	}
 }
 
-void AEnemyRangedCharacter::ActivateFromPool(const FVector& SpawnLocation, const FRotator& SpawnRotation)
+void AEnemyRangedCharacter::ActivateFromPool(const FVector& SpawnLocation, const FRotator& SpawnRotation, const UEnemyAIStats* DifficultyStats, float RuntimeCoefficient)
 {
 	if(!HasAuthority())
 	{
@@ -193,8 +202,7 @@ void AEnemyRangedCharacter::ActivateFromPool(const FVector& SpawnLocation, const
 	}
 
 	// Get health based off of damage coefficient.
-	// RangedEnemyBaseHealth = ;
-	RangedEnemyCurrentHealth = RangedEnemyBaseHealth;
+	ApplyDifficulty(DifficultyStats, RuntimeCoefficient);
 
 	SetActorLocationAndRotation(SpawnLocation, SpawnRotation, false, nullptr, ETeleportType::TeleportPhysics);
 
@@ -248,3 +256,32 @@ void AEnemyRangedCharacter::OnRep_PoolActive()
 	ApplyPoolState();
 }
 //End Enemy Object Pooling
+
+
+void AEnemyRangedCharacter::ApplyDifficulty(const UEnemyAIStats* DifficultyStats, float RuntimeCoefficient)
+{
+	if(!DifficultyStats)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[DIFFICULTY ERROR]: %s received NULL DifficultyStats! RuntimeCoefficient = %.3f"), *GetName(), RuntimeCoefficient);
+
+		MaxHealth = RangedEnemyBaseHealth;
+		RangedEnemyCurrentHealth = MaxHealth;
+		Damage = BaseDamage;
+
+		return;
+	}
+
+	float HealthScaling = FMath::Pow(RuntimeCoefficient, 1.0f);
+	float DamageScaling = FMath::Pow(RuntimeCoefficient, 0.6f);
+
+	float currentHealthCoefficient = DifficultyStats->GetEnemyHealthCoefficient() * HealthScaling;
+	float currentDamageCoefficient = DifficultyStats->GetEnemyDamageCoefficient() * DamageScaling;
+	
+	MaxHealth = RangedEnemyBaseHealth * currentHealthCoefficient;
+	RangedEnemyCurrentHealth = MaxHealth;
+	Damage = BaseDamage * currentDamageCoefficient;
+	
+	UE_LOG(LogTemp, Warning, TEXT("[DIFFICULTY] %s | RuntimeCoefficient: %.3f | HealthScale: %.3f | DamageScale: %.3f"),*GetName(), RuntimeCoefficient, HealthScaling, DamageScaling);
+	UE_LOG(LogTemp, Warning, TEXT("[ENEMY RANGED SCALING] CurrentHealthCoefficient = %f, CurrentDamageCoefficient = %f."), currentHealthCoefficient, currentDamageCoefficient);
+	UE_LOG(LogTemp, Warning, TEXT("[ENEMY RANGED SCALING] CurrentHealth = %f, CurrentDamage = %f."), RangedEnemyCurrentHealth, Damage);
+}

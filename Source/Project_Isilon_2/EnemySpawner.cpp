@@ -181,35 +181,7 @@ void AEnemySpawner::ActivatePooledMelee(UNavigationSystemV1* NavigationSystem)
 		{
 			return;
 		}
-		MeleeE->ActivateFromPool(spawnLocation1, GetActorRotation());
-}
-
-void AEnemySpawner::ActivatePooledRanged(UNavigationSystemV1* NavigationSystem)
-{
-	FNavLocation RangedNavLocation;
-	
-	const bool bFoundRangedSpawnLocation = NavigationSystem->GetRandomReachablePointInRadius(
-		GetActorLocation(),
-		SpawnRadius,
-		RangedNavLocation
-	);
-
-	if(!bFoundRangedSpawnLocation)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to find spawn location for enemy in EnemySpawner %s"), *GetPathName());
-		return;
-	}
-
-	const FVector spawnLocation2 = RangedNavLocation.Location + FVector::UpVector * SpawnHeightOffsetRanged;
-
-	AEnemyRangedCharacter* RangedE = GetRangedEnemyFromPool();
-
-	if(!IsValid(RangedE))
-	{
-		return;
-	}
-
-	RangedE->ActivateFromPool(spawnLocation2, GetActorRotation());
+		MeleeE->ActivateFromPool(spawnLocation1, GetActorRotation(), DifficultyStats, CalculateRuntimeDifficultyCoefficient());
 }
 
 AEnemyCharacter* AEnemySpawner::GetMeleeEnemyFromPool()
@@ -240,6 +212,34 @@ void AEnemySpawner::ReturnMeleeEnemyToPool(AEnemyCharacter* Enemy)
 
 	FTimerHandle RespawnTimerHandle;
 	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &AEnemySpawner::RespawnMeleeEnemy, RespawnDelay, false);
+}
+
+void AEnemySpawner::ActivatePooledRanged(UNavigationSystemV1* NavigationSystem)
+{
+	FNavLocation RangedNavLocation;
+	
+	const bool bFoundRangedSpawnLocation = NavigationSystem->GetRandomReachablePointInRadius(
+		GetActorLocation(),
+		SpawnRadius,
+		RangedNavLocation
+	);
+
+	if(!bFoundRangedSpawnLocation)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find spawn location for enemy in EnemySpawner %s"), *GetPathName());
+		return;
+	}
+
+	const FVector spawnLocation2 = RangedNavLocation.Location + FVector::UpVector * SpawnHeightOffsetRanged;
+
+	AEnemyRangedCharacter* RangedE = GetRangedEnemyFromPool();
+
+	if(!IsValid(RangedE))
+	{
+		return;
+	}
+
+	RangedE->ActivateFromPool(spawnLocation2, GetActorRotation(), DifficultyStats, CalculateRuntimeDifficultyCoefficient());
 }
 
 AEnemyRangedCharacter* AEnemySpawner::GetRangedEnemyFromPool()
@@ -346,4 +346,22 @@ int32 AEnemySpawner::GetActiveRangedCount() const
 	}
 
 	return count;
+}
+
+float AEnemySpawner::CalculateRuntimeDifficultyCoefficient() const
+{
+	if(!GetWorld())
+	{
+		return 1.0f;
+	}
+
+	const float ElapsedSeconds = GetWorld()->GetTimeSeconds();
+	const float ElapsedMinutes = ElapsedSeconds / 60.0f;
+
+	const float RuntimeCoefficient = 1.0f + (ElapsedMinutes * DifficultyGrowthPerMinute);
+
+	UE_LOG(LogTemp, Warning, TEXT("[DIFFICULTY] Seconds: %.2f | Minutes: %.2f | GrowthPerMinute: %.2f | RuntimeCoefficient: %.3f"),
+									ElapsedSeconds, ElapsedMinutes, DifficultyGrowthPerMinute, RuntimeCoefficient);
+
+	return FMath::Max(RuntimeCoefficient, 1.0f);
 }

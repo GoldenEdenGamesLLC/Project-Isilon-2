@@ -7,6 +7,7 @@
 #include "EnemyCharacter.generated.h"
 
 class AEnemySpawner;
+class UEnemyAIStats;
 
 UCLASS()
 class PROJECT_ISILON_2_API AEnemyCharacter : public ACharacter
@@ -21,14 +22,26 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, Category="Health")
+	UPROPERTY(EditDefaultsOnly, Category="Stats")
 	float MeleeEnemyBaseHealth = 150.0f;
 
-	UPROPERTY(ReplicatedUsing = OnRep_MeleeEnemyCurrentHealth, VisibleAnywhere, BlueprintReadOnly, Category="Health")
+	UPROPERTY(ReplicatedUsing = OnRep_MeleeEnemyCurrentHealth, VisibleAnywhere, BlueprintReadOnly, Category="Stats")
 	float MeleeEnemyCurrentHealth = 150.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Stats")
+	float BaseDamage = 20.0f;
+
+	UPROPERTY(ReplicatedUsing = OnRep_MaxHealth, VisibleAnywhere, BlueprintReadOnly, Category="Stats")
+	float MaxHealth;
+	float Damage;
+
+	void ApplyDifficulty(const UEnemyAIStats* DifficultyStats, float RuntimeCoefficient);
 
 	UFUNCTION()
 	void OnRep_MeleeEnemyCurrentHealth();
+
+	UFUNCTION()
+	void OnRep_MaxHealth();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -51,7 +64,7 @@ public:
 	// ===========================================
 	// OBJECT POOLING
 	// ===========================================
-	void ActivateFromPool(const FVector& SpawnLocation, const FRotator& SpawnRotation);
+	void ActivateFromPool(const FVector& SpawnLocation, const FRotator& SpawnRotation, const UEnemyAIStats* DifficultyStats, float RuntimeCoefficient);
 
 	void DeactivateForPool();
 

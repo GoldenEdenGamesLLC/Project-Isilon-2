@@ -7,6 +7,7 @@
 #include "EnemySpawner.generated.h"
 
 class APawn;
+class UEnemyAIStats;
 class USceneComponent;
 class UBillboardComponent;
 class UNavigationSystemV1;
@@ -29,11 +30,18 @@ public:
 	void ReturnMeleeEnemyToPool(AEnemyCharacter* Enemy);
 	void ReturnRangedEnemyToPool(AEnemyRangedCharacter* Enemy);
 
+	float CalculateRuntimeDifficultyCoefficient() const;
+
 	virtual void Tick(float DeltaTime) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Difficulty")
+	TObjectPtr<UEnemyAIStats> DifficultyStats;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Difficulty|Runtime")
+	float DifficultyGrowthPerMinute = 0.10f;
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<USceneComponent> SceneRoot;
