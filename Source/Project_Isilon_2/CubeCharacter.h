@@ -136,7 +136,7 @@ private:
 	float BasicAttackSpeed = 0.75f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
-	float BasicAttackDamage = 15000.0f;
+	float BasicAttackDamage = 200.0f;
 
 	void BasicAttackPressed();
 	void PerformBasicAttack(FRotator AimRotation);

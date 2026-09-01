@@ -257,7 +257,6 @@ void AEnemyRangedCharacter::OnRep_PoolActive()
 }
 //End Enemy Object Pooling
 
-
 void AEnemyRangedCharacter::ApplyDifficulty(const UEnemyAIStats* DifficultyStats, float RuntimeCoefficient)
 {
 	if(!DifficultyStats)
@@ -271,11 +270,11 @@ void AEnemyRangedCharacter::ApplyDifficulty(const UEnemyAIStats* DifficultyStats
 		return;
 	}
 
-	float HealthScaling = FMath::Pow(RuntimeCoefficient, 1.0f);
-	float DamageScaling = FMath::Pow(RuntimeCoefficient, 0.6f);
+	const float HealthScaling = FMath::Pow(RuntimeCoefficient, 1.0f);
+	const float DamageScaling = FMath::Pow(RuntimeCoefficient, 0.6f);
 
-	float currentHealthCoefficient = DifficultyStats->GetEnemyHealthCoefficient() * HealthScaling;
-	float currentDamageCoefficient = DifficultyStats->GetEnemyDamageCoefficient() * DamageScaling;
+	const float currentHealthCoefficient = DifficultyStats->GetEnemyHealthCoefficient() * HealthScaling;
+	const float currentDamageCoefficient = DifficultyStats->GetEnemyDamageCoefficient() * DamageScaling;
 	
 	MaxHealth = RangedEnemyBaseHealth * currentHealthCoefficient;
 	RangedEnemyCurrentHealth = MaxHealth;

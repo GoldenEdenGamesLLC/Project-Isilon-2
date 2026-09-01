@@ -52,6 +52,10 @@ protected:
 	void OnRep_PoolActive();
 
 	void ApplyPoolState();
+
+	TArray<uint16> HealthVariations = { 300, 275, 250, 200, 150 };
+	TArray<uint16> SpeedsVariations = { 100, 200, 300, 400, 500 };
+	int16 RandomIndex = 0;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
