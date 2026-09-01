@@ -158,30 +158,32 @@ void AEnemySpawner::SpawnWave()
 
 void AEnemySpawner::ActivatePooledMelee(UNavigationSystemV1* NavigationSystem)
 {
-		FNavLocation MeleeNavLocation;
+	FNavLocation MeleeNavLocation;
 
-		const bool bFoundMeleeSpawnLocation = NavigationSystem->GetRandomReachablePointInRadius(
-			GetActorLocation(),
-			SpawnRadius,
-			MeleeNavLocation
-		);
+	const bool bFoundMeleeSpawnLocation = NavigationSystem->GetRandomReachablePointInRadius(
+		GetActorLocation(),
+		SpawnRadius,
+		MeleeNavLocation
+	);
 
-		if(!bFoundMeleeSpawnLocation)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to find spawn location for enemy in EnemySpawner %s"), *GetPathName());
-			return;
-		}
+	if(!bFoundMeleeSpawnLocation)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find spawn location for enemy in EnemySpawner %s"), *GetPathName());
+		return;
+	}
 
-		const FVector spawnLocation1 = MeleeNavLocation.Location + FVector::UpVector * SpawnHeightOffsetMelee;
-		// Spawn the enemy at the calculated location
+	const FVector spawnLocation1 = MeleeNavLocation.Location + FVector::UpVector * SpawnHeightOffsetMelee;
+	// Spawn the enemy at the calculated location
 
-		AEnemyCharacter* MeleeE = GetMeleeEnemyFromPool();
+	AEnemyCharacter* MeleeE = GetMeleeEnemyFromPool();
 
-		if(!IsValid(MeleeE))
-		{
-			return;
-		}
-		MeleeE->ActivateFromPool(spawnLocation1, GetActorRotation(), DifficultyStats, CalculateRuntimeDifficultyCoefficient());
+	if(!IsValid(MeleeE))
+	{
+		return;
+	}
+
+	MeleeE->ActivateFromPool(spawnLocation1, GetActorRotation(), DifficultyStats, CalculateRuntimeDifficultyCoefficient());
+	// UE_LOG(LogTemp, Error, TEXT("[MELEE POOL] CURRENT SIZE = %d."), GetMeleePoolCount());
 }
 
 AEnemyCharacter* AEnemySpawner::GetMeleeEnemyFromPool()
@@ -240,6 +242,7 @@ void AEnemySpawner::ActivatePooledRanged(UNavigationSystemV1* NavigationSystem)
 	}
 
 	RangedE->ActivateFromPool(spawnLocation2, GetActorRotation(), DifficultyStats, CalculateRuntimeDifficultyCoefficient());
+	// UE_LOG(LogTemp, Error, TEXT("[RANGED POOL] CURRENT SIZE = %d."), GetRangedPoolCount());
 }
 
 AEnemyRangedCharacter* AEnemySpawner::GetRangedEnemyFromPool()
