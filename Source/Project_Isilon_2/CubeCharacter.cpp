@@ -173,9 +173,7 @@ void ACubeCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ACubeCharacter, BaseHealth);
 	DOREPLIFETIME(ACubeCharacter, CurrentHealth);
-	DOREPLIFETIME(ACubeCharacter, MaxHealth);
 }
 
 void ACubeCharacter::Move(const FInputActionValue& val)
@@ -579,19 +577,9 @@ void ACubeCharacter::ServerInteract_Implementation(AInteractableActor* Interacta
 }
 
 // START DEFENSE
-void ACubeCharacter::OnRep_BaseHealth()
-{
-	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] Player Character Base Health - Barbarian = %s health Updated: %.1f"), *GetName(), BaseHealth);	
-}
-
 void ACubeCharacter::OnRep_CurrentHealth()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] Player Character Current Health - Barbarian = %s health Updated: %.1f"), *GetName(), CurrentHealth);	
-}
-
-void ACubeCharacter::OnRep_MaxHealth()
-{
-	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] MaxHealth = %s health Updated: %.1f"), *GetName(), MaxHealth);
 }
 
 float ACubeCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

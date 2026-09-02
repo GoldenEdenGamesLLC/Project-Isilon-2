@@ -154,28 +154,19 @@ private:
 	void ResetBasicAttackCooldown();
 
 	// ===========================================
-	// Defensive Stats
+	// Stats
 	// ===========================================
 	
-	UPROPERTY(ReplicatedUsing = OnRep_BaseHealth, EditDefaultsOnly, Category = "Defense")
-	float BaseHealth = 200.0f;
-		
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, EditDefaultsOnly, Category = "Defense")
 	float CurrentHealth = 200.0f;
-
-	UPROPERTY(ReplicatedUsing = OnRep_MaxHealth, EditDefaultsOnly, Category = "Defense")
-	float MaxHealth = 200.0f;
-
-	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 	
-	UFUNCTION()
-	void OnRep_BaseHealth();
+	float BaseHealth = 200.0f;
+	float MaxHealth = 200.0f;
+	
+	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
 	UFUNCTION()
 	void OnRep_CurrentHealth();
-
-	UFUNCTION()
-	void OnRep_MaxHealth();
 
 	// ===========================================
 	// Inputs

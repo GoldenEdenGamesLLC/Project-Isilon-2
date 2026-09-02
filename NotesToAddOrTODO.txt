@@ -14,6 +14,7 @@ Player
 4. Interaction
 5. Health Bar
 6. Show Cooldowns
+7. Have Scroll wheel be able to zoom you out?????
 
 Enemies
 1. Death Animations
@@ -25,3 +26,7 @@ World
 1. Interaction for chests/item
 2. Timer
 3. Show difficulty
+4. Day Night Cycles?
+5. Aurora Borealis
+6. Lighting for the level (Torches?)
+7. RTX and Shaders
