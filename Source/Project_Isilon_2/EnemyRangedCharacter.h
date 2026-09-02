@@ -32,7 +32,7 @@ protected:
 	float RangedEnemyCurrentHealth = 80.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Stats")
-	float BaseDamage = 20.0f;
+	float BaseDamage = 35.0f;
 
 	UPROPERTY(ReplicatedUsing = OnRep_MaxHealth, VisibleAnywhere, BlueprintReadOnly, Category="Stats")
 	float MaxHealth;

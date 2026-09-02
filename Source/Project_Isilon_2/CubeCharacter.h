@@ -47,6 +47,9 @@ protected:
 	virtual bool CanJumpInternal_Implementation() const override;
 	virtual void OnJumped_Implementation() override;
 	virtual void Landed(const FHitResult& Hit) override;
+	
+	//replicated overrides
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
 	// ===========================================
@@ -149,6 +152,30 @@ private:
 
 	void BasicAttackCompleted();
 	void ResetBasicAttackCooldown();
+
+	// ===========================================
+	// Defensive Stats
+	// ===========================================
+	
+	UPROPERTY(ReplicatedUsing = OnRep_BaseHealth, EditDefaultsOnly, Category = "Defense")
+	float BaseHealth = 200.0f;
+		
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, EditDefaultsOnly, Category = "Defense")
+	float CurrentHealth = 200.0f;
+
+	UPROPERTY(ReplicatedUsing = OnRep_MaxHealth, EditDefaultsOnly, Category = "Defense")
+	float MaxHealth = 200.0f;
+
+	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	
+	UFUNCTION()
+	void OnRep_BaseHealth();
+
+	UFUNCTION()
+	void OnRep_CurrentHealth();
+
+	UFUNCTION()
+	void OnRep_MaxHealth();
 
 	// ===========================================
 	// Inputs

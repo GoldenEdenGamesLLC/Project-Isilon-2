@@ -18,6 +18,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "InputActionValue.h"
 #include "TimerManager.h"
+#include "Net/UnrealNetwork.h"
 
 #include "Blueprint/UserWidget.h"
 #include "DrawDebugHelpers.h"
@@ -166,6 +167,15 @@ void ACubeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &ACubeCharacter::InteractWithObject);
 		EnhancedInputComponent->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &ACubeCharacter::BasicAttackPressed);
 	}
+}
+
+void ACubeCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACubeCharacter, BaseHealth);
+	DOREPLIFETIME(ACubeCharacter, CurrentHealth);
+	DOREPLIFETIME(ACubeCharacter, MaxHealth);
 }
 
 void ACubeCharacter::Move(const FInputActionValue& val)
@@ -567,3 +577,39 @@ void ACubeCharacter::ServerInteract_Implementation(AInteractableActor* Interacta
 
 	Interactable->Interact(this);
 }
+
+// START DEFENSE
+void ACubeCharacter::OnRep_BaseHealth()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] Player Character Base Health - Barbarian = %s health Updated: %.1f"), *GetName(), BaseHealth);	
+}
+
+void ACubeCharacter::OnRep_CurrentHealth()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] Player Character Current Health - Barbarian = %s health Updated: %.1f"), *GetName(), CurrentHealth);	
+}
+
+void ACubeCharacter::OnRep_MaxHealth()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] MaxHealth = %s health Updated: %.1f"), *GetName(), MaxHealth);
+}
+
+float ACubeCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if(!HasAuthority())
+	{
+		return 0.0f;
+	}
+
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	CurrentHealth = FMath::Clamp(CurrentHealth - ActualDamage, 0.0f, MaxHealth);
+	UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), ActualDamage, CurrentHealth);
+
+	if(CurrentHealth <= 0.0f)
+	{
+		//die
+	}
+	
+	return ActualDamage;
+}
+// END DEFENSE

@@ -1,6 +1,27 @@
 TODO//TOImplement:
+
+Niceties
 1. Screen Stop when you die
 2. Screen Shake when you take damage
 3. Slow motion after screen stop to show your character die
 4. Good other rewards from monster drops - Double points, insta kill, other boosts... 
 4a. Have an owl or something drop and scan the area for chests/item drops.
+
+Player
+1. Have Player Take Damage
+2. Continue making stats - Add in leveling system for character to increase stats passively.
+3. Death animation
+4. Interaction
+5. Health Bar
+6. Show Cooldowns
+
+Enemies
+1. Death Animations
+2. Stat increases
+3. Attacking
+4. Health Bars
+
+World
+1. Interaction for chests/item
+2. Timer
+3. Show difficulty
