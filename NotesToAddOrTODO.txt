@@ -15,6 +15,7 @@ Player
 5. Health Bar
 6. Show Cooldowns
 7. Have Scroll wheel be able to zoom you out?????
+8. Have Momentum halt but still hold the momentum and when double jump is initiated then go a different direction.
 
 Enemies
 1. Death Animations
@@ -30,3 +31,4 @@ World
 5. Aurora Borealis
 6. Lighting for the level (Torches?)
 7. RTX and Shaders
+8. Have enemies spawn only where character is.

@@ -222,6 +222,39 @@ void ACubeCharacter::OnJumped_Implementation()
 {
 	Super::OnJumped_Implementation();
 
+	if(JumpTotals <= 1)
+	{
+		return;
+	}
+
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	if(!Movement)
+	{
+		return;
+	}
+
+	//Change directions when jumping
+	FVector InputDirection = GetLastMovementInputVector();
+	InputDirection.Z = 0.0f;
+
+	if(InputDirection.IsNearlyZero())
+	{
+		//keep momentum since no directional input
+		return;
+	}
+
+	InputDirection.Normalize();
+
+	FVector HorizontalVelocity = Movement->Velocity;
+	HorizontalVelocity.Z = 0.0f;
+
+	const float CurrentHorizontalSpeed = HorizontalVelocity.Size();
+	// const float CurrentHorizontalSpeed = Movement->MaxWalkSpeed;
+
+	const FVector NewHorizontalVelocity = InputDirection * CurrentHorizontalSpeed;
+
+	Movement->Velocity.X = NewHorizontalVelocity.X;
+	Movement->Velocity.Y = NewHorizontalVelocity.Y;
 }
 
 void ACubeCharacter::Landed(const FHitResult& Hit)

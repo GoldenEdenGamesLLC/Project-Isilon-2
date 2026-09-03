@@ -22,6 +22,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// ===========================================
+	// Stats
+	// ===========================================
+
 	UPROPERTY(EditDefaultsOnly, Category="Stats")
 	float MeleeEnemyBaseHealth = 150.0f;
 

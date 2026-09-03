@@ -135,12 +135,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
 	float BasicAttackEndDistance = 100.0f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
-	float BasicAttackSpeed = 0.75f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
-	float BasicAttackDamage = 200.0f;
-
 	void BasicAttackPressed();
 	void PerformBasicAttack(FRotator AimRotation);
 
@@ -156,6 +150,12 @@ private:
 	// ===========================================
 	// Stats
 	// ===========================================
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
+	float BasicAttackSpeed = 0.75f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
+	float BasicAttackDamage = 200.0f;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, EditDefaultsOnly, Category = "Defense")
 	float CurrentHealth = 200.0f;
