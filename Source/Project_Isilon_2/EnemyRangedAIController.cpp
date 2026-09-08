@@ -1,7 +1,7 @@
 //Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "EnemyRangedAIController.h"
+#include "EnemyRangedCharacter.h"
 
 #include "Navigation/PathFollowingComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -9,12 +9,14 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 
-void AEnemyRangedAIController::OnPossess(APawn* InPawn){
+void AEnemyRangedAIController::OnPossess(APawn* InPawn)
+{
     Super::OnPossess(InPawn);
 
     if(!HasAuthority()){
         return;
     }
+    bPausedForPooling = false;
 
     RingAngleDegrees = FMath::FRandRange(0.0f, 360.0f);
 
@@ -23,24 +25,26 @@ void AEnemyRangedAIController::OnPossess(APawn* InPawn){
     GetWorldTimerManager().SetTimer(ChaseTimer, this, &AEnemyRangedAIController::UpdateChase, ChaseCheckInterval, true);
 }
 
-void AEnemyRangedAIController::OnUnPossess(){
+void AEnemyRangedAIController::OnUnPossess()
+{
+    Super::OnUnPossess();
 
     GetWorldTimerManager().ClearTimer(ChaseTimer);
 
     StopChasing();
 
-    Super::OnUnPossess();
+    bPausedForPooling = false;
 }
 
 //who to chase
 void AEnemyRangedAIController::UpdateChase()
 {
-    if(!HasAuthority()){
+    if(!HasAuthority() || bPausedForPooling){
         return;
     }
 
-    APawn* ControlledEnemy = GetPawn();
-    if(!IsValid(ControlledEnemy)){
+    AEnemyRangedCharacter* RangedEnemy = Cast<AEnemyRangedCharacter>(GetPawn());
+    if(!IsValid(RangedEnemy)){
         return;
     }
 
@@ -52,16 +56,22 @@ void AEnemyRangedAIController::UpdateChase()
         return;
     }
 
-    const float Distance = FVector::Distance(ControlledEnemy->GetActorLocation(), ClosestPlayer->GetActorLocation());
+    const float DistanceSquared = FVector::DistSquared(RangedEnemy->GetActorLocation(), ClosestPlayer->GetActorLocation());
     //Acquiring Target
     const bool bSameTarget = currTarget.IsValid() && currTarget.Get() == ClosestPlayer;
     const float RequiredDistance = bSameTarget && bIsChasing ? LoseDistance : ChaseDistance;
 
-    if(Distance > RequiredDistance)
+    const float CastRange = RangedEnemy->GetCastEnterDistance();
+
+    if(DistanceSquared > FMath::Square(RequiredDistance))
     {
+        StopMovement();
+        ClearFocus(EAIFocusPriority::Gameplay);
+        
         currTarget.Reset();
+        
         bIsChasing = false;
-        bIsInAttackRange = false;
+        bIsInCastingRange = false;
 
         return;
     }
@@ -71,22 +81,27 @@ void AEnemyRangedAIController::UpdateChase()
 
     //checks attack range to focus on player then check exit distance so attack channels until
     //player is out of range
-    const bool bWasInAttackRange = bIsInAttackRange;
-    if(bIsInAttackRange)
+    const bool bWasInCastingRange = bIsInCastingRange;
+    const float CastEnterDistance = RangedEnemy->GetCastEnterDistance();
+    const float CastExitDistance = RangedEnemy->GetCastExitDistance();
+
+    if(bIsInCastingRange)
     {
-        bIsInAttackRange = Distance <= AttackExitDistance;
+        bIsInCastingRange = DistanceSquared <= FMath::Square(CastExitDistance);
     }
     else
     {
-        bIsInAttackRange = Distance <= AttackEnterDistance;
+        bIsInCastingRange = DistanceSquared <= FMath::Square(CastEnterDistance);
     }
 
     //focuses on player when in attack range
-    if(bIsInAttackRange)
+    if(bIsInCastingRange)
     {
         SetFocus(ClosestPlayer, EAIFocusPriority::Gameplay);
+        RangedEnemy->TryCast(ClosestPlayer);
     }
-    else if(bWasInAttackRange)
+    
+    if(bWasInCastingRange)
     {
         ClearFocus(EAIFocusPriority::Gameplay);
     }
@@ -154,12 +169,15 @@ void AEnemyRangedAIController::StopChasing()
     bIsChasing = false;
 }
 
+//Begin Pooling
 void AEnemyRangedAIController::PauseForPooling()
 {
     if(!HasAuthority())
     {
 		return;
 	}
+
+    bPausedForPooling = true;
 
     GetWorldTimerManager().ClearTimer(ChaseTimer);
 
@@ -168,7 +186,7 @@ void AEnemyRangedAIController::PauseForPooling()
 
     currTarget.Reset();
     bIsChasing = false;
-    bIsInAttackRange = false;
+    bIsInCastingRange = false;
 }
 
 void AEnemyRangedAIController::ResumeFromPooling()
@@ -177,6 +195,8 @@ void AEnemyRangedAIController::ResumeFromPooling()
     {
 		return;
 	}
+
+    bPausedForPooling = false;
 
     currTarget.Reset();
     bIsChasing = false;
@@ -187,3 +207,6 @@ void AEnemyRangedAIController::ResumeFromPooling()
 
     GetWorldTimerManager().SetTimer(ChaseTimer, this, &AEnemyRangedAIController::UpdateChase, ChaseCheckInterval, true);
 }
+//END POOLING
+
+//Start 

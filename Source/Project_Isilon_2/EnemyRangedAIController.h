@@ -47,13 +47,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="AI|Flying", meta = (ClampMin = "0.0"))
 	float HoverHeight = 200.0f;
 
-	//allows the attack to be a little bit larger so the channel can happen better
-	UPROPERTY(EditDefaultsOnly, Category="AI|Flying", meta = (ClampMin = "0.0"))
-	float AttackEnterDistance = 300.0f;
-
-	UPROPERTY(EditDefaultsOnly, Category="AI|Flying", meta = (ClampMin = "0.0"))
-	float AttackExitDistance = 500.0f;
-
 	UPROPERTY(EditDefaultsOnly, Category="AI|Flying", meta = (ClampMin = "0.0"))
 	float RingRadius = 200.0f;
 	float RingAngleDegrees = 0.0f;
@@ -61,7 +54,9 @@ private:
 	FTimerHandle ChaseTimer;
 	TWeakObjectPtr<APawn> currTarget;
 	bool bIsChasing = false;
-	bool bIsInAttackRange = false;
+	bool bIsInCastingRange = false;
+
+	bool bPausedForPooling = false;
 
 public:
 	APawn* GetCurrentTarget() const
@@ -79,16 +74,6 @@ public:
 		return AcceptanceRadius;
 	}
 
-	float GetAttackEnterDistance() const
-	{
-		return AttackEnterDistance;
-	}
-
-	float GetAttackExitDistance() const
-	{
-		return AttackExitDistance;
-	}
-
 	float GetRingRadius() const
 	{
 		return RingRadius;
@@ -99,8 +84,8 @@ public:
 		return RingAngleDegrees;
 	}
 
-	bool IsInAttackRange() const
+	bool IsInCastingRange() const
 	{
-		return bIsInAttackRange;
+		return bIsInCastingRange;
 	}
 };

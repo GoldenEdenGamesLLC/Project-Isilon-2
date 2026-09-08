@@ -32,3 +32,10 @@ World
 6. Lighting for the level (Torches?)
 7. RTX and Shaders
 8. Have enemies spawn only where character is.
+9. Dynamic world loading
+9a. https://forums.unrealengine.com/t/ue5-4-5-5-c-guide-on-how-to-load-classic-map-and-level-instances-looking-for-feedback/2043484
+
+Business
+1. Change Business Address
+2. Hire Animator and Artist after Demo is finished and things are good
+3. Possibly give percentage of game profits and the $42k

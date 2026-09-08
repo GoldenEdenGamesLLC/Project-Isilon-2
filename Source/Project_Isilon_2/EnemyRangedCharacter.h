@@ -48,6 +48,75 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	// ===========================================
+	// Movement Update
+	// ===========================================
+
+	FTimerHandle RangedMovementTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category="AI")
+	float MovementUpdateInterval = 0.05f;
+
+	void UpdateRangedMovement();
+
+	// ===========================================
+	// Telegraph
+	// ===========================================
+
+	FTimerHandle TelegraphTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat|Telegraph")
+	float TelegraphUpdateInterval = 0.05f;
+
+	float TelegraphStartTime = 0.0f;
+	bool bTelegraphActive = false;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartCastTelegraphVFX(AActor* Target);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStopCastTelegraphVFX();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastAttackVFX(FVector Start, FVector End, bool bHit);
+
+	void DrawCastTelegraph();
+
+	// ===========================================
+	// Ranged Cast Attack
+	// ===========================================
+
+	FTimerHandle RangedCastingTimerHandle;
+	FTimerHandle RangedCastCooldownTimerHandle;
+
+	TWeakObjectPtr<AActor> CastingTarget;
+	TWeakObjectPtr<AActor> TelegraphTarget;
+
+	//allows the attack to be a little bit larger so the channel can happen better
+	UPROPERTY(EditDefaultsOnly, Category="Combat", meta = (ClampMin = "0.0"))
+	float CastEnterDistance = 300.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat", meta = (ClampMin = "0.0"))
+	float CastExitDistance = 600.0f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	float CastingCooldown = 0.75f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	float CastingTime = 1.0f;
+
+	float CastStartTime = 0.0f;
+
+	bool bCanCast = true;
+	bool bIsCasting = false;
+
+	void BeginCast(AActor* Target);
+	void CompleteCast();
+	void PerformCast(AActor* Target);
+
+	void ResetCastCooldown();
+	void CancelCast();
+
 	UPROPERTY(ReplicatedUsing = OnRep_PoolActive)
 	bool bPoolActive = false;
 
@@ -63,6 +132,23 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	// ===========================================
+	// ATTACK
+	// ===========================================
+	
+	void TryCast(AActor* Target);
+	void ResetBasicCast();
+	
+	float GetCastEnterDistance() const
+	{
+		return CastEnterDistance;
+	}
+
+	float GetCastExitDistance() const
+	{
+		return CastExitDistance;
+	}
 
 	// ===========================================
 	// OBJECT POOLING
