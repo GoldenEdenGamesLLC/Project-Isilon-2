@@ -8,7 +8,10 @@
 #include "EnemyAIController.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "DrawDebugHelpers.h"
+#include "TimerManager.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -22,9 +25,9 @@ AEnemyCharacter::AEnemyCharacter()
 	AIControllerClass = AEnemyAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	bUseControllerRotationPitch = true;
+	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
-	bUseControllerRotationRoll = true;
+	bUseControllerRotationRoll = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 400.0f, 0.0f);
@@ -136,6 +139,9 @@ void AEnemyCharacter::ActivateFromPool(const FVector& SpawnLocation, const FRota
 		return;
 	}
 
+	GetWorldTimerManager().ClearTimer(AttackCooldownTimerHandle);
+	bCanAttack = true;
+
 	// Get health and damage based off of damage coefficient.
 	ApplyDifficulty(DifficultyStats, RuntimeCoefficient);
 
@@ -165,6 +171,9 @@ void AEnemyCharacter::DeactivateForPool()
 	
 	bPoolActive = false;
 
+	GetWorldTimerManager().ClearTimer(AttackCooldownTimerHandle);
+	bCanAttack = true;
+
 	//stop movement
 	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->DisableMovement();
@@ -181,6 +190,7 @@ void AEnemyCharacter::DeactivateForPool()
 }
 //End Enemy Object Pooling
 
+//Enemy Scaling
 void AEnemyCharacter::ApplyDifficulty(const UEnemyAIStats* DifficultyStats, float RuntimeCoefficient)
 {
 	if(!DifficultyStats)
@@ -213,7 +223,84 @@ void AEnemyCharacter::ApplyDifficulty(const UEnemyAIStats* DifficultyStats, floa
 	MeleeEnemyCurrentHealth = MaxHealth;
 	Damage = BaseDamage * currentDamageCoefficient;
 
-	UE_LOG(LogTemp, Warning, TEXT("[DIFFICULTY] %s | RuntimeCoefficient: %.3f | HealthScale: %.3f | DamageScale: %.3f"),*GetName(), RuntimeCoefficient, HealthScaling, DamageScaling);
-	UE_LOG(LogTemp, Warning, TEXT("[MELEE RANGED SCALING] CurrentHealthCoefficient = %f, CurrentDamageCoefficient = %f."), currentHealthCoefficient, currentDamageCoefficient);
-	UE_LOG(LogTemp, Warning, TEXT("[MELEE RANGED SCALING] CurrentHealth = %f, CurrentDamage = %f."), MeleeEnemyCurrentHealth, Damage);
+	// UE_LOG(LogTemp, Warning, TEXT("[DIFFICULTY] %s | RuntimeCoefficient: %.3f | HealthScale: %.3f | DamageScale: %.3f"),*GetName(), RuntimeCoefficient, HealthScaling, DamageScaling);
+	// UE_LOG(LogTemp, Warning, TEXT("[MELEE RANGED SCALING] CurrentHealthCoefficient = %f, CurrentDamageCoefficient = %f."), currentHealthCoefficient, currentDamageCoefficient);
+	// UE_LOG(LogTemp, Warning, TEXT("[MELEE RANGED SCALING] CurrentHealth = %f, CurrentDamage = %f."), MeleeEnemyCurrentHealth, Damage);
 }
+//End Enemy Scaling
+
+//Start Attack
+void AEnemyCharacter::PerformAttack(AActor* Target)
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	if(!IsValid(Target))
+	{
+		return;
+	}
+
+	const float DistanceSquared = FVector::DistSquared2D(GetActorLocation(), Target->GetActorLocation());
+
+	if(DistanceSquared > FMath::Square(AttackRange))
+	{
+		return;
+	}
+
+	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, 50.0f);
+	const FVector End = Target->GetActorLocation() + FVector(0.0f, 0.0f, AttackRange);
+
+	UE_LOG(LogTemp, Warning, TEXT("[MELEE ENEMY ATTACK] %s attacked %s for %.1f damage."), *GetName(), *Target->GetName(), Damage);
+	UGameplayStatics::ApplyDamage(Target, Damage, GetController(), this, UDamageType::StaticClass());
+	MulticastAttackVFX(Start, End, true);
+}
+
+void AEnemyCharacter::ResetAttackCooldown()
+{
+	bCanAttack = true;
+}
+
+void AEnemyCharacter::MulticastAttackVFX_Implementation(FVector Start, FVector End, bool bHit)
+{
+	const FColor LineColor = bHit ? FColor::Red : FColor::Green;
+	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 1.0f, 0, 5.0f);
+
+	DrawDebugSphere(GetWorld(), End, 15.0f, 12, LineColor, false, 1.0f);
+}
+
+void AEnemyCharacter::TryAttack(AActor* Target)
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	if(!bPoolActive)
+	{
+		return;
+	}
+
+	if(!bCanAttack)
+	{
+		return;
+	}
+
+	if(!IsValid(Target))
+	{
+		return;
+	}
+
+	const float DistanceSquared = FVector::DistSquared(GetActorLocation(), Target->GetActorLocation());
+	
+	if(DistanceSquared > FMath::Square(AttackRange))
+	{
+		return;
+	}
+
+	bCanAttack = false;
+	PerformAttack(Target);
+	GetWorldTimerManager().SetTimer(AttackCooldownTimerHandle, this, &AEnemyCharacter::ResetAttackCooldown, AttackCooldown, false);
+}
+//End Attack

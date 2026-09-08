@@ -2,6 +2,7 @@
 
 
 #include "EnemyAIController.h"
+#include "EnemyCharacter.h"
 
 #include "Navigation/PathFollowingComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -60,9 +61,28 @@ void AEnemyAIController::UpdateChase()
 
     const float RequiredDistanceSquared = bAlreadyChasingThisPlayer ? LoseDistance : ChaseDistance;
 
+    AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(GetPawn());
+    const float AttackRange = Enemy->GetAttackRange();
+
     if(DistanceSquared > FMath::Square(RequiredDistanceSquared))
     {
         StopChasing();
+        return;
+    }
+
+    if(DistanceSquared <= FMath::Square(AttackRange))
+    {
+        if(!bAlreadyChasingThisPlayer)
+        {
+            currTarget = ClosestPlayer;
+            bIsChasing = true;
+        }
+
+        StopMovement();
+
+        SetFocus(ClosestPlayer, EAIFocusPriority::Gameplay);
+        Enemy->TryAttack(ClosestPlayer);
+
         return;
     }
 
@@ -71,6 +91,8 @@ void AEnemyAIController::UpdateChase()
         currTarget = ClosestPlayer;
         bIsChasing = true;
     }
+
+    ClearFocus(EAIFocusPriority::Gameplay);
 
     if(GetMoveStatus() != EPathFollowingStatus::Moving)
     {

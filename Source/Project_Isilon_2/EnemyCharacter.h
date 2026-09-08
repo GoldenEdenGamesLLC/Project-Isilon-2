@@ -49,6 +49,30 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	// ===========================================
+	// Attack
+	// ===========================================
+
+	FTimerHandle AttackCooldownTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	float AttackRange = 50.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	float AttackCooldown = 1.0f;
+
+	bool bCanAttack = true;
+
+	void PerformAttack(AActor* Target);
+	void ResetAttackCooldown();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastAttackVFX(FVector Start, FVector End, bool bHit);
+
+	// ===========================================
+	// Object Pooling
+	// ===========================================
+
 	UPROPERTY(ReplicatedUsing = OnRep_PoolActive)
 	bool bPoolActive = false;
 
@@ -70,8 +94,20 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	// ===========================================
+	// ATTACK
+	// ===========================================
+	
+	void TryAttack(AActor* Target);
+
+	float GetAttackRange() const
+	{
+		return AttackRange;
+	}
+
+	// ===========================================
 	// OBJECT POOLING
 	// ===========================================
+
 	void ActivateFromPool(const FVector& SpawnLocation, const FRotator& SpawnRotation, const UEnemyAIStats* DifficultyStats, float RuntimeCoefficient);
 
 	void DeactivateForPool();

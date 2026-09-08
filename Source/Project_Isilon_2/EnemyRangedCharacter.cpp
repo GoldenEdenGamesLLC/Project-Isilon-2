@@ -280,7 +280,7 @@ void AEnemyRangedCharacter::ApplyDifficulty(const UEnemyAIStats* DifficultyStats
 	RangedEnemyCurrentHealth = MaxHealth;
 	Damage = BaseDamage * currentDamageCoefficient;
 	
-	UE_LOG(LogTemp, Warning, TEXT("[DIFFICULTY] %s | RuntimeCoefficient: %.3f | HealthScale: %.3f | DamageScale: %.3f"),*GetName(), RuntimeCoefficient, HealthScaling, DamageScaling);
-	UE_LOG(LogTemp, Warning, TEXT("[ENEMY RANGED SCALING] CurrentHealthCoefficient = %f, CurrentDamageCoefficient = %f."), currentHealthCoefficient, currentDamageCoefficient);
-	UE_LOG(LogTemp, Warning, TEXT("[ENEMY RANGED SCALING] CurrentHealth = %f, CurrentDamage = %f."), RangedEnemyCurrentHealth, Damage);
+	// UE_LOG(LogTemp, Warning, TEXT("[DIFFICULTY] %s | RuntimeCoefficient: %.3f | HealthScale: %.3f | DamageScale: %.3f"),*GetName(), RuntimeCoefficient, HealthScaling, DamageScaling);
+	// UE_LOG(LogTemp, Warning, TEXT("[ENEMY RANGED SCALING] CurrentHealthCoefficient = %f, CurrentDamageCoefficient = %f."), currentHealthCoefficient, currentDamageCoefficient);
+	// UE_LOG(LogTemp, Warning, TEXT("[ENEMY RANGED SCALING] CurrentHealth = %f, CurrentDamage = %f."), RangedEnemyCurrentHealth, Damage);
 }
