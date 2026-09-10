@@ -8,6 +8,7 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "EnemyRangedAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -70,7 +71,6 @@ void AEnemyRangedCharacter::PossessedBy(AController* NewController)
 
 void AEnemyRangedCharacter::UpdateRangedMovement()
 {
-
 	if(!HasAuthority())
 	{
 		return;
@@ -116,8 +116,22 @@ void AEnemyRangedCharacter::UpdateRangedMovement()
 		return;
 	}
 
+	//change direction
 	const FVector Direction = ToTarget.GetSafeNormal();
 	Movement->Velocity = Direction * Movement->MaxFlySpeed;
+
+	FVector StartLocation = GetActorLocation();
+
+	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation, PlayerLocation);
+
+	TargetRotation.Pitch = 0.0f;
+	TargetRotation.Roll = 0.0f;
+
+	float DeltaTime = UGameplayStatics::GetWorldDeltaSeconds(this);
+	FRotator CurrentRotation = GetActorRotation();
+	FRotator NewRot = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, 5.0f);
+
+	SetActorRotation(NewRot);
 }
 
 //Start Damage Taking Section
