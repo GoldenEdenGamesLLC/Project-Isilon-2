@@ -92,12 +92,11 @@ protected:
 	TWeakObjectPtr<AActor> CastingTarget;
 	TWeakObjectPtr<AActor> TelegraphTarget;
 
-	//allows the attack to be a little bit larger so the channel can happen better
 	UPROPERTY(EditDefaultsOnly, Category="Combat", meta = (ClampMin = "0.0"))
-	float CastEnterDistance = 300.0f;
+	float CastEnterDistance = 500.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Combat", meta = (ClampMin = "0.0"))
-	float CastExitDistance = 600.0f;
+	float CastExitDistance = 650.0f;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Combat")
 	float CastingCooldown = 0.75f;
