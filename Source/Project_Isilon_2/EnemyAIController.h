@@ -7,6 +7,7 @@
 #include "EnemyAIController.generated.h"
 
 class APawn;
+class AEnemyCharacter;
 
 /**
  * Enemy AI Controller
@@ -50,6 +51,30 @@ private:
 	FTimerHandle ChaseTimer;
 	TWeakObjectPtr<APawn> currTarget;
 	bool bIsChasing = false;
+
+	// ===========================================
+	// Stuck / Jump Detection
+	// ===========================================
+	UPROPERTY(EditAnywhere, Category="AI|Jump")
+	float StuckThresholdTime = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category="AI|Jump")
+	float MovementThreshold = 10.0f;
+	
+	UPROPERTY(EditAnywhere, Category="AI|Jump")
+	float ObstacleCheckDistance = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category="AI|Jump")
+	float JumpForwardStrength = 350.0f;
+	
+	UPROPERTY(EditAnywhere, Category="AI|Jump")
+	float JumpZStrength = 420.0f;
+
+	float StuckTimer = 0.0f;
+	FVector LastPosition = FVector::ZeroVector;
+	bool bHasLastPosition = false;
+
+	bool TryJumpObstacle(AEnemyCharacter* Enemy, APawn* Target);
 
 	bool bPausedForPooling = false;
 };
