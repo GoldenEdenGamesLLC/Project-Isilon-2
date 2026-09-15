@@ -33,8 +33,8 @@ AEnemyRangedCharacter::AEnemyRangedCharacter()
 	Movement->bOrientRotationToMovement = true;
 	Movement->RotationRate = FRotator(0.0f, 400.0f, 0.0f);
 	Movement->GravityScale = 0.0f;
-	Movement->MaxFlySpeed = 350.0f;
-	Movement->MaxAcceleration = 500.f;
+	Movement->MaxFlySpeed = 200.0f;
+	Movement->MaxAcceleration = 300.f;
 	Movement->BrakingDecelerationFlying = 350.0f;
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -47,8 +47,6 @@ void AEnemyRangedCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-	// const FString AuthorityString = HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT");
-	// UE_LOG(LogTemp, Warning, TEXT("[RANGED CHARACTER][%s] BeginPlay: %s | Controller: %s"), *AuthorityString, *GetNameSafe(this), *GetNameSafe(GetController()));
 }
 
 // Called every frame

@@ -21,7 +21,7 @@ Enemies
 2. Stat increases
 3. Health Bars
 4. Make enemies jump
-5. Ranged doesn't face when attacking and ranged not all attacking
+DONE 5. Ranged doesn't face when attacking and ranged not all attacking
 6. Pathing makes them chase you and stare at a wall
 7. Melee can't jump
 
