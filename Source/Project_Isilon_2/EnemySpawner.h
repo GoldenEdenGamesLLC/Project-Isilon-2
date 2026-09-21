@@ -58,7 +58,7 @@ private:
 	TSubclassOf<APawn> EnemyClass_2;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Spawning", meta=(ClampMin=1))
-	int32 numEnemiesToSpawn = 5;
+	int32 numEnemiesToSpawn = 100;
 
 	// ===========================================
 	// SPAWN CIRCLE RADIUS
@@ -82,10 +82,10 @@ private:
 	// ===========================================
 
 	UPROPERTY(EditDefaultsOnly, Category="Object Pooling")
-	int32 InitialMeleePoolSize = 25;
+	int32 InitialMeleePoolSize = 100;
 
 	UPROPERTY(EditDefaultsOnly, Category="Object Pooling")
-	int32 InitialRangedPoolSize = 25;
+	int32 InitialRangedPoolSize = 100;
 
 	UPROPERTY(EditDefaultsOnly, Category="Object Pooling")
 	float RespawnDelay = 3.0f;
@@ -123,4 +123,6 @@ private:
 
 	int32 GetActiveMeleeCount() const;
 	int32 GetActiveRangedCount() const;
+
+	bool FindValidSpawnLocation(UNavigationSystemV1* NavigationSystem, FVector& OutSpawnLocation);
 };

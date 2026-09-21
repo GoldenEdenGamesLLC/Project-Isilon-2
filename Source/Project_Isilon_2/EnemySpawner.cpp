@@ -7,6 +7,7 @@
 
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/BillboardComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SceneComponent.h"
 #include "GameFramework/Pawn.h"
 #include "NavigationSystem.h"
@@ -158,22 +159,10 @@ void AEnemySpawner::SpawnWave()
 
 void AEnemySpawner::ActivatePooledMelee(UNavigationSystemV1* NavigationSystem)
 {
-	FNavLocation MeleeNavLocation;
-
-	const bool bFoundMeleeSpawnLocation = NavigationSystem->GetRandomReachablePointInRadius(
-		GetActorLocation(),
-		SpawnRadius,
-		MeleeNavLocation
-	);
-
-	if(!bFoundMeleeSpawnLocation)
+	if(!IsValid(NavigationSystem))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to find spawn location for enemy in EnemySpawner %s"), *GetPathName());
 		return;
 	}
-
-	const FVector spawnLocation1 = MeleeNavLocation.Location + FVector::UpVector * SpawnHeightOffsetMelee;
-	// Spawn the enemy at the calculated location
 
 	AEnemyCharacter* MeleeE = GetMeleeEnemyFromPool();
 
@@ -182,8 +171,22 @@ void AEnemySpawner::ActivatePooledMelee(UNavigationSystemV1* NavigationSystem)
 		return;
 	}
 
+	FVector MeleeSpawn;
+
+	bool bFoundMeleeSpawnLocation = FindValidSpawnLocation(NavigationSystem, MeleeSpawn);
+
+	if(!bFoundMeleeSpawnLocation)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find spawn location for enemy in EnemySpawner %s"), *GetPathName());
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Spawner=%s, | NavPoint=%s | Offset=%.2f"), *GetActorLocation().ToString(), *MeleeSpawn.ToString(), SpawnHeightOffsetMelee);
+	const FVector spawnLocation1 = MeleeSpawn + FVector::UpVector * SpawnHeightOffsetMelee;
+	// Spawn the enemy at the calculated location
+
+	UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] CapsuleHalfHeight=%.2f | ActorScale=%s"), MeleeE->GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), *MeleeE->GetActorScale3D().ToString());
 	MeleeE->ActivateFromPool(spawnLocation1, GetActorRotation(), DifficultyStats, CalculateRuntimeDifficultyCoefficient());
-	// UE_LOG(LogTemp, Error, TEXT("[MELEE POOL] CURRENT SIZE = %d."), GetMeleePoolCount());
 }
 
 AEnemyCharacter* AEnemySpawner::GetMeleeEnemyFromPool()
@@ -218,13 +221,21 @@ void AEnemySpawner::ReturnMeleeEnemyToPool(AEnemyCharacter* Enemy)
 
 void AEnemySpawner::ActivatePooledRanged(UNavigationSystemV1* NavigationSystem)
 {
-	FNavLocation RangedNavLocation;
+	if(!IsValid(NavigationSystem))
+	{
+		return;
+	}
+
+	AEnemyRangedCharacter* RangedE = GetRangedEnemyFromPool();
 	
-	const bool bFoundRangedSpawnLocation = NavigationSystem->GetRandomReachablePointInRadius(
-		GetActorLocation(),
-		SpawnRadius,
-		RangedNavLocation
-	);
+	if(!IsValid(RangedE))
+	{
+		return;
+	}
+
+	FVector RangedSpawn;
+	
+	bool bFoundRangedSpawnLocation = FindValidSpawnLocation(NavigationSystem, RangedSpawn);
 
 	if(!bFoundRangedSpawnLocation)
 	{
@@ -232,14 +243,9 @@ void AEnemySpawner::ActivatePooledRanged(UNavigationSystemV1* NavigationSystem)
 		return;
 	}
 
-	const FVector spawnLocation2 = RangedNavLocation.Location + FVector::UpVector * SpawnHeightOffsetRanged;
+	UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Spawner=%s, | NavPoint=%s | Offset=%.2f"), *GetActorLocation().ToString(), *RangedSpawn.ToString(), SpawnHeightOffsetRanged);
 
-	AEnemyRangedCharacter* RangedE = GetRangedEnemyFromPool();
-
-	if(!IsValid(RangedE))
-	{
-		return;
-	}
+	const FVector spawnLocation2 = RangedSpawn + FVector::UpVector * SpawnHeightOffsetRanged;
 
 	RangedE->ActivateFromPool(spawnLocation2, GetActorRotation(), DifficultyStats, CalculateRuntimeDifficultyCoefficient());
 	// UE_LOG(LogTemp, Error, TEXT("[RANGED POOL] CURRENT SIZE = %d."), GetRangedPoolCount());
@@ -273,6 +279,50 @@ void AEnemySpawner::ReturnRangedEnemyToPool(AEnemyRangedCharacter* Enemy)
 
 	FTimerHandle RespawnTimerHandle;
 	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &AEnemySpawner::RespawnRangedEnemy, RespawnDelay, false);
+}
+
+bool AEnemySpawner::FindValidSpawnLocation(UNavigationSystemV1* NavigationSystem, FVector& OutSpawnLocation)
+{
+	if(!NavigationSystem)
+	{
+		return false;
+	}
+
+	FVector SpawnerLocation = GetActorLocation();
+	constexpr int32 MaxAttempts = 10;
+	constexpr float MaxVerticalDifference = 800.0f;
+	
+	for(int32 i = 0; i < MaxAttempts; ++i)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Attempt=%d starting."), i)
+
+		FNavLocation NavLocation;
+
+		const bool bFoundPoint = NavigationSystem->GetRandomReachablePointInRadius(SpawnerLocation, SpawnRadius, NavLocation);
+
+		if(!bFoundPoint)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Attempt=%d failed, continuing."), i)
+			continue;
+		}
+
+		const float VerticalDifference = FMath::Abs(NavLocation.Location.Z - SpawnerLocation.Z);
+		UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Attempt=%d | Spawner=%s | NavPoint=%s | VerticalDifference=%.2f"), i, *SpawnerLocation.ToString(), *NavLocation.Location.ToString(), VerticalDifference);
+
+		if(VerticalDifference > MaxVerticalDifference)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Rejected nav point - vertical difference > 500."));
+			continue;
+		}
+	
+		OutSpawnLocation = NavLocation.Location;
+
+		return true;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Failed to find spawn location."))
+
+	return false;
 }
 
 // Called every frame
