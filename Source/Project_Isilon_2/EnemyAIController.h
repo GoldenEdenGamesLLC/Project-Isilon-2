@@ -8,6 +8,7 @@
 
 class APawn;
 class AEnemyCharacter;
+class AJumpNavLinkProxy;
 
 /**
  * Enemy AI Controller
@@ -20,11 +21,16 @@ class PROJECT_ISILON_2_API AEnemyAIController : public AAIController
 public:
 	void PauseForPooling();
 	void ResumeFromPooling();
+	void SetActiveJumpLink(AJumpNavLinkProxy* JumpLink);
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
 
+	UFUNCTION()
+	void HandleEnemyLanded(const FHitResult& Hit);
+	
+	TWeakObjectPtr<AJumpNavLinkProxy> ActiveJumpLink;
 private:
 	void UpdateChase();
 	APawn* FindClosestPlayer() const;
@@ -62,13 +68,15 @@ private:
 	float MovementThreshold = 10.0f;
 	
 	UPROPERTY(EditAnywhere, Category="AI|Jump")
-	float ObstacleCheckDistance = 100.0f;
+	float ObstacleCheckDistance = 300.0f;
 
 	UPROPERTY(EditAnywhere, Category="AI|Jump")
-	float JumpForwardStrength = 350.0f;
+	// float JumpForwardStrength = 350.0f;
+	float JumpForwardStrength = 500.0f;
 	
 	UPROPERTY(EditAnywhere, Category="AI|Jump")
-	float JumpZStrength = 420.0f;
+	// float JumpZStrength = 420.0f;
+	float JumpZStrength = 550.0f;
 
 	float StuckTimer = 0.0f;
 	FVector LastPosition = FVector::ZeroVector;
