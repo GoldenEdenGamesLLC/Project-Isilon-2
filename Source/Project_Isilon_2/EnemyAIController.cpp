@@ -3,6 +3,7 @@
 
 #include "EnemyAIController.h"
 #include "EnemyCharacter.h"
+#include "JumpNavLinkProxy.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Navigation/PathFollowingComponent.h"
@@ -21,6 +22,13 @@ void AEnemyAIController::OnPossess(APawn* InPawn){
         return;
     }
 
+    AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(InPawn);
+
+    if(Enemy)
+    {
+        Enemy->LandedDelegate.AddUniqueDynamic(this, &AEnemyAIController::HandleEnemyLanded);
+    }
+
     bPausedForPooling = false;
     bIsChasing = false;
     currTarget.Reset();
@@ -35,13 +43,20 @@ void AEnemyAIController::OnPossess(APawn* InPawn){
 }
 
 void AEnemyAIController::OnUnPossess(){
-    Super::OnUnPossess();
+    if(AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(GetPawn()))
+    {
+        Enemy->LandedDelegate.RemoveDynamic(this, &AEnemyAIController::HandleEnemyLanded);
+    }
+
+    ActiveJumpLink.Reset();
 
     GetWorldTimerManager().ClearTimer(ChaseTimer);
-
+    
     StopChasing();
-
+    
     bPausedForPooling = false;
+    
+    Super::OnUnPossess();
 }
 
 void AEnemyAIController::UpdateChase()
@@ -104,7 +119,7 @@ void AEnemyAIController::UpdateChase()
     {
         const float DistanceMoved = FVector::Dist2D(CurrentPosition, LastPosition);
 
-        if(bAlreadyChasingThisPlayer)
+        if(bAlreadyChasingThisPlayer /*&& DistanceMoved < MovementThreshold*/)
         {
             StuckTimer += ChaseCheckInterval;
         }
@@ -116,18 +131,17 @@ void AEnemyAIController::UpdateChase()
         LastPosition = CurrentPosition;
     }
 
-    if(StuckTimer >= StuckThresholdTime)
-    {
-        if(TryJumpObstacle(Enemy, ClosestPlayer))
-        {
-            StuckTimer = 0.0f;
-            return;
-        }
+    // if(StuckTimer >= StuckThresholdTime)
+    // {
+    //     if(TryJumpObstacle(Enemy, ClosestPlayer))
+    //     {
+    //         StuckTimer = 0.0f;
+    //         return;
+    //     }
 
-        StuckTimer = 0.0f;
-        MoveToActor(ClosestPlayer, AcceptanceRadius, false, true, true, nullptr, true);
-        return;
-    }
+    //     StuckTimer = 0.0f;
+    //     return;
+    // }
 
     if(!bAlreadyChasingThisPlayer)
     {
@@ -282,7 +296,7 @@ bool AEnemyAIController::TryJumpObstacle(AEnemyCharacter* Enemy, APawn* Target)
     FVector HighStart = Enemy->GetActorLocation() + FVector(0.0f, 0.0f, 40.0f);
     HighStart += JumpDirection * (CapsuleRadius + 5.0f);
 
-    const FVector HighEnd = HighStart + JumpDirection + ObstacleCheckDistance;
+    const FVector HighEnd = HighStart + JumpDirection * ObstacleCheckDistance;
     
     FCollisionQueryParams QueryParams;
     
@@ -305,4 +319,26 @@ bool AEnemyAIController::TryJumpObstacle(AEnemyCharacter* Enemy, APawn* Target)
     }
 
     return false;
+}
+
+//JUMP NAV LINK
+void AEnemyAIController::SetActiveJumpLink(AJumpNavLinkProxy* JumpLink)
+{
+    ActiveJumpLink = JumpLink;
+}
+
+void AEnemyAIController::HandleEnemyLanded(const FHitResult& Hit)
+{
+    if(!HasAuthority())
+    {
+        return;
+    }
+
+    APawn* Enemy = GetPawn();
+
+    if(ActiveJumpLink.IsValid() && IsValid(Enemy))
+    {
+        ActiveJumpLink->FinishJump(Enemy);
+        ActiveJumpLink.Reset();
+    }
 }

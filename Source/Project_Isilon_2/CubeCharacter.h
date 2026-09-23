@@ -171,6 +171,7 @@ private:
 	// ===========================================
 	// Inputs
 	// ===========================================
+	
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
