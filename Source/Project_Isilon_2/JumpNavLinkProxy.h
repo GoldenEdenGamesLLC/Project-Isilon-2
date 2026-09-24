@@ -34,4 +34,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Jump")
 	float MaxHorizontalJumpSpeed = 1000.0f;
+
+	UPROPERTY(EditAnywhere, Category="Jump|Drop")
+	float DropHeightThreshold = 75.0f;
+
+	UPROPERTY(EditAnywhere, Category="Jump|Drop")
+	float MinDropSpeed = 300.0f;
+
+	UPROPERTY(EditAnywhere, Category="Jump|Drop")
+	float MaxDropSpeed = 800.0f;
+
 };

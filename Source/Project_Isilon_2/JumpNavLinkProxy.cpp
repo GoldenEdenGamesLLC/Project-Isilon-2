@@ -58,7 +58,7 @@ void AJumpNavLinkProxy::HandleSmartLinkReached(UNavLinkCustomComponent* LinkComp
 
     UE_LOG(LogTemp, Warning, TEXT("[JUMP LINK] %s jumping\n Start: %s\n Destination: %s\n Velocity: %s"), *GetNameSafe(Enemy), *Enemy->GetActorLocation().ToString(), *DestPoint.ToString(), *LaunchVelocity.ToString());
 
-    Enemy->GetCharacterMovement()->StopMovementImmediately();
+    // Enemy->GetCharacterMovement()->StopMovementImmediately();
     EnemyController->SetActiveJumpLink(this);
     Enemy->LaunchCharacter(LaunchVelocity, true, true);
 }
@@ -90,6 +90,40 @@ bool AJumpNavLinkProxy::CalculateJumpVelocity(AEnemyCharacter* Enemy, const FVec
     if(Gravity <= KINDA_SMALL_NUMBER)
     {
         return false;
+    }
+
+    const float HeightDifference = End.Z - Start.Z;
+
+    //fall/run off
+    if(HeightDifference < -DropHeightThreshold)
+    {
+        const float DropHeight = Start.Z - End.Z;
+        const float FallTime = FMath::Sqrt((2.0 * DropHeight) / Gravity);
+
+        if(FallTime <= KINDA_SMALL_NUMBER)
+        {
+            return false;
+        }
+
+        FVector HorizontalDelta = End - Start;
+        HorizontalDelta.Z = 0.0f;
+
+        const float HorizontalDistance = HorizontalDelta.Size();
+
+        if(HorizontalDistance <= KINDA_SMALL_NUMBER)
+        {
+            return false;
+        }
+
+        const FVector Direction = HorizontalDelta.GetSafeNormal();
+        const float CalculateSpeed = HorizontalDistance / FallTime;
+
+        const float DropSpeed = FMath::Clamp(FMath::Max(CalculateSpeed, Movement->MaxWalkSpeed), MinDropSpeed, MaxDropSpeed);
+        OutVelocity = Direction * DropSpeed;
+
+        OutVelocity.Z = 0.0f;
+
+        return true;
     }
 
     //  Apex above both platforms
