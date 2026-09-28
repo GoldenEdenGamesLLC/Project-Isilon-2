@@ -166,6 +166,8 @@ void ACubeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &ACubeCharacter::DashPressed);
 		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &ACubeCharacter::InteractWithObject);
 		EnhancedInputComponent->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &ACubeCharacter::BasicAttackPressed);
+		EnhancedInputComponent->BindAction(IA_Massacre, ETriggerEvent::Started, this, &ACubeCharacter::MassacrePressed);
+		EnhancedInputComponent->BindAction(IA_Ultimate, ETriggerEvent::Started, this, &ACubeCharacter::UltimateThrowPressed);
 	}
 }
 
@@ -634,3 +636,147 @@ float ACubeCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 	return ActualDamage;
 }
 // END DEFENSE
+
+// BEGIN Massacre
+//TODO:
+//1. Fix Character snapping for rotation
+//2. Massacre not resetting
+void ACubeCharacter::MassacrePressed()
+{
+	if(!bCanMassacre)
+	{
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[MASSACRE DEBUG] Massacre Pressed - MassacreAttackCount = %d"), MassacreAttackCount);
+
+	if(HasAuthority())
+	{
+		PerformMassacre();
+		return;
+	}
+
+	GetWorldTimerManager().SetTimer(MassacreCooldownTimerHandle, this, &ACubeCharacter::ResetMassacreCooldown, MassacreCooldown, false);
+
+	ServerMassacre();
+}
+
+void ACubeCharacter::ServerMassacre_Implementation()
+{
+	if(!bCanMassacre)
+	{
+		return;
+	}
+
+	PerformMassacre();
+}
+
+void ACubeCharacter::PerformMassacre()
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	if(bCanMassacre)
+	{
+		bCanMassacre = false;
+	}
+
+	if(MaxMassacreAttackCount > MassacreAttackCount)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[MASSACRE DEBUG] Attack #%d"), MassacreAttackCount);
+		MassacreAttackCount++;
+		
+		const FRotator AimRotation = followCamera->GetComponentRotation();
+		const FVector AttackDirection = AimRotation.Vector().GetSafeNormal();
+
+		FVector StartingLocation = GetActorLocation();
+		FVector MassacreStart = StartingLocation + (AttackDirection * MassacreStartDistance);
+		FVector MassacreEnd = StartingLocation + (AttackDirection * MassacreEndDistance);
+
+		TArray<FHitResult> HitResults;
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(this);
+
+		//upgrade makes capsule
+		FCollisionShape MassacreSweep = FCollisionShape::MakeCapsule(MassacreRadius, MassacreHalfHeight);
+
+		bool bHit = GetWorld()->SweepMultiByChannel(HitResults, MassacreStart, MassacreEnd, FQuat::Identity, ECC_Pawn, MassacreSweep, QueryParams);
+
+		TSet<AActor*> damagedActors;
+		if(bHit)
+		{
+			for(auto& Hit : HitResults)
+			{
+				//deal damage
+				AActor* HitActor = Hit.GetActor();
+				if(HitActor)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("[MASSACRE SERVER] Massacre Attack Hit: %s"), *HitActor->GetName());
+					damagedActors.Add(HitActor);
+					
+					UGameplayStatics::ApplyDamage(HitActor, MassacreAttackDamage, GetController(), this, UDamageType::StaticClass());
+				}
+			}
+		}
+		
+		MulticastMassacreFX(MassacreStart, MassacreEnd, bHit);
+
+		if(MaxMassacreAttackCount > MassacreAttackCount)
+		{
+			if(!GetWorldTimerManager().IsTimerActive(MassacreAttackTimerHandle))
+			{
+				//must use lambda to pass 
+				//GetWorldTimerManager().SetTimer(MassacreAttackTimerHandle, [this, AimRotation]() { this->PerformMassacre(AimRotation); }, MassacreAttackSpeed, false);
+				GetWorldTimerManager().SetTimer(MassacreAttackTimerHandle, this, &ACubeCharacter::PerformMassacre, MassacreAttackSpeed, true);
+			}
+		}
+	}
+
+	//Reset once attacks >= 5
+	if(MaxMassacreAttackCount <= MassacreAttackCount)
+	{
+		if(!GetWorldTimerManager().IsTimerActive(MassacreCooldownTimerHandle))
+		{
+			GetWorldTimerManager().SetTimer(MassacreCooldownTimerHandle, this, &ACubeCharacter::ResetMassacreCooldown, MassacreCooldown, false);
+		}
+	}
+}
+
+void ACubeCharacter::ResetMassacreCooldown()
+{
+	bCanMassacre = true;
+	MassacreAttackCount = 0;
+
+	GetWorldTimerManager().ClearTimer(MassacreCooldownTimerHandle);
+	GetWorldTimerManager().ClearTimer(MassacreAttackTimerHandle);
+}
+
+void ACubeCharacter::MulticastMassacreFX_Implementation(FVector Start, FVector End, bool bHit)
+{
+	DrawDebugCapsule(GetWorld(), Start, MassacreHalfHeight, MassacreRadius, FQuat::Identity, FColor::Yellow, false, 1.0f);
+
+	DrawDebugCapsule(GetWorld(), End, MassacreHalfHeight, MassacreRadius, FQuat::Identity, bHit ? FColor::Red : FColor::Green, false, 1.0f);
+}
+// END Massacre
+
+// BEGIN ULTIMATE
+void ACubeCharacter::UltimateThrowPressed()
+{
+	if(!bCanUltimate)
+	{
+		return;
+	}
+}
+
+void ACubeCharacter::ResetUltimateThrowCooldown()
+{
+
+}
+
+void ACubeCharacter::MulticastUltimateThrowFX_Implementation(FVector Start, FVector End, bool bHit)
+{
+
+}
+// END ULTIMATE

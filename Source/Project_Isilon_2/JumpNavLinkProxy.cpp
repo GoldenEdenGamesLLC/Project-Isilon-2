@@ -50,13 +50,13 @@ void AJumpNavLinkProxy::HandleSmartLinkReached(UNavLinkCustomComponent* LinkComp
 
     if(!CalculateJumpVelocity(Enemy, DestPoint, LaunchVelocity))
     {
-        UE_LOG(LogTemp, Warning, TEXT("[JUMP LINK] Could not calculate jump for %s"), *GetNameSafe(Enemy));
+        //UE_LOG(LogTemp, Warning, TEXT("[JUMP LINK] Could not calculate jump for %s"), *GetNameSafe(Enemy));
 
         ResumePathFollowing(Enemy);
         return;
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("[JUMP LINK] %s jumping\n Start: %s\n Destination: %s\n Velocity: %s"), *GetNameSafe(Enemy), *Enemy->GetActorLocation().ToString(), *DestPoint.ToString(), *LaunchVelocity.ToString());
+    //UE_LOG(LogTemp, Warning, TEXT("[JUMP LINK] %s jumping\n Start: %s\n Destination: %s\n Velocity: %s"), *GetNameSafe(Enemy), *Enemy->GetActorLocation().ToString(), *DestPoint.ToString(), *LaunchVelocity.ToString());
 
     // Enemy->GetCharacterMovement()->StopMovementImmediately();
     EnemyController->SetActiveJumpLink(this);
@@ -159,7 +159,7 @@ bool AJumpNavLinkProxy::CalculateJumpVelocity(AEnemyCharacter* Enemy, const FVec
 
     if(HorizontalVelocity.Size() > MaxHorizontalJumpSpeed)
     {
-        UE_LOG(LogTemp, Warning, TEXT("[JUMP LINK] Required horizontal speed = %.2f\n > max = %.2f"), HorizontalVelocity.Size(), MaxHorizontalJumpSpeed);
+        //UE_LOG(LogTemp, Warning, TEXT("[JUMP LINK] Required horizontal speed = %.2f\n > max = %.2f"), HorizontalVelocity.Size(), MaxHorizontalJumpSpeed);
         return false;
     }
 

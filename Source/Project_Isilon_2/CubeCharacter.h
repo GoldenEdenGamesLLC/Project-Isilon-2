@@ -122,6 +122,12 @@ private:
 	
 	bool bCanBasicAttack = true;
 	FTimerHandle BasicAttackCooldownTimerHandle;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
+	float BasicAttackSpeed = 0.75f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
+	float BasicAttackDamage = 125.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
 	float BasicAttackHalfHeight = 50.0f;
@@ -148,14 +154,67 @@ private:
 	void ResetBasicAttackCooldown();
 
 	// ===========================================
-	// Stats
+	// Ultimate - Barbarian
 	// ===========================================
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
-	float BasicAttackSpeed = 0.75f;
+	bool bCanUltimate = true;
+	FTimerHandle UltimateCooldownTimerHandle;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
-	float BasicAttackDamage = 200.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "Ultimate Ability")
+	float UltimateThrowRadius = 2000.0f;
+
+	void UltimateThrowPressed();
+	void ResetUltimateThrowCooldown();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastUltimateThrowFX(FVector Start, FVector End, bool bHit);
+
+	// ===========================================
+	// Massacre
+	// ===========================================
+
+	bool bCanMassacre = true;
+	int MaxMassacreAttackCount = 5;
+	int MassacreAttackCount = 0;
+
+	FTimerHandle MassacreCooldownTimerHandle;
+	FTimerHandle MassacreAttackTimerHandle;
+		
+	UPROPERTY(EditDefaultsOnly, Category = "Massacre Ability")
+	float MassacreAttackDamage = 100.0f; // * 5
+
+	UPROPERTY(EditDefaultsOnly, Category = "Massacre Ability")
+	float MassacreHalfHeight = 60.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Massacre Ability")
+	float MassacreRadius = 100.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Massacre Ability")
+	float MassacreStartDistance = 80.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Massacre Ability")
+	float MassacreEndDistance = 150.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Massacre Ability")
+	float MassacreCooldown = 3.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Massacre Ability")
+	float MassacreAttackSpeed = 0.15f;
+
+	void MassacrePressed();
+	void ResetMassacreCooldown();
+
+	void PerformMassacre();
+
+	UFUNCTION(Server, Reliable)
+	void ServerMassacre();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastMassacreFX(FVector Start, FVector End, bool bHit);
+	
+	// ===========================================
+	// Stats
+	// ===========================================
 	
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, EditDefaultsOnly, Category = "Defense")
 	float CurrentHealth = 200.0f;
@@ -192,6 +251,12 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> IA_Interact;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> IA_Ultimate;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> IA_Massacre;
 
 	void Move(const FInputActionValue& val);
 	void Look(const FInputActionValue& val);

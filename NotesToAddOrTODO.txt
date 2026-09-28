@@ -7,7 +7,7 @@ Niceties
 4. Good other rewards from monster drops - Double points, insta kill, other boosts... 
 4a. Have an owl or something drop and scan the area for chests/item drops.
 
-Player
+Barbarian
 1. Have Player Take Damage
 2. Continue making stats - Add in leveling system for character to increase stats passively.
 3. Death animation
@@ -15,12 +15,14 @@ Player
 5. Health Bar
 6. Show Cooldowns
 7. Implement fall damage
+8. Implement Massacre
+9. Implement Spear (Axe)
 
 Enemies
 1. Death Animations
 2. Stat increases
 3. Health Bars
-4. Make enemies jump
+DONE 4. Make enemies jump (Changed to jump up and down large areas)
 DONE 5. Ranged doesn't face when attacking and ranged not all attacking
 6. Pathing makes them chase you and stare at a wall
 DONE? 7. Melee can't jump, stop pathing when there is no object in front of them
