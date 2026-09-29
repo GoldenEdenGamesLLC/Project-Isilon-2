@@ -159,18 +159,32 @@ private:
 	
 	bool bCanUltimate = true;
 	FTimerHandle UltimateCooldownTimerHandle;
+	FTimerHandle ChainsOfRageTetherDuration;
+
+	UPROPERTY()
+	TArray<TObjectPtr<AActor>> ChainsOfRageTargets;
+
+	FVector ChainsOfRageCenter;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
 	float CoRThrowDistance = 5000.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float CoRAxeLandingRadius = 5000.0f;
+	float CoRAxeLandingRadius = 1000.0f;
 	
-	// UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	// float CoRThrowDistance = 5000.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float CoRMaxTetherDistance = 1000.0f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float CoRDuration = 6.0f;
 
-	void UltimateThrowPressed();
+	void ChainsOfRagePressed();
 	void ResetUltimateThrowCooldown();
+
+	void ChainsOfRageThrowAxe();
+
+	void PostImpactChainsOfRage(const FVector& ImpactPoint);
+	void UpdateChainsOfRageTethers();
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastUltimateThrowFX(FVector Start, FVector End, bool bHit);
@@ -315,6 +329,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="UI")
 	TSubclassOf<UUserWidget> CrosshairWidgetClass;
 
-	UPROPERTY(EditDefaultsOnly, Category="UI")
+	UPROPERTY()
 	TObjectPtr<UUserWidget> CrosshairWidget;
 };

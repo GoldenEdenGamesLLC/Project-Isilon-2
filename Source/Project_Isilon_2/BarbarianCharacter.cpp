@@ -16,12 +16,16 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "InputActionValue.h"
-#include "TimerManager.h"
+#include "Engine/OverlapResult.h"
 #include "Net/UnrealNetwork.h"
+#include "InputActionValue.h"
+#include "Engine/World.h"
+#include "TimerManager.h"
 
 #include "Blueprint/UserWidget.h"
 #include "DrawDebugHelpers.h"
+
+#include "EnemyInterface.h"
 
 //ignores players and focuses on enemies when dashing
 #define ECC_Enemy ECC_GameTraceChannel1
@@ -167,7 +171,7 @@ void ABarbarianCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &ABarbarianCharacter::InteractWithObject);
 		EnhancedInputComponent->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &ABarbarianCharacter::BasicAttackPressed);
 		EnhancedInputComponent->BindAction(IA_Massacre, ETriggerEvent::Started, this, &ABarbarianCharacter::MassacrePressed);
-		EnhancedInputComponent->BindAction(IA_Ultimate, ETriggerEvent::Started, this, &ABarbarianCharacter::UltimateThrowPressed);
+		EnhancedInputComponent->BindAction(IA_Ultimate, ETriggerEvent::Started, this, &ABarbarianCharacter::ChainsOfRagePressed);
 	}
 }
 
@@ -762,12 +766,105 @@ void ABarbarianCharacter::MulticastMassacreFX_Implementation(FVector Start, FVec
 // END Massacre
 
 // BEGIN ULTIMATE
-void ABarbarianCharacter::UltimateThrowPressed()
+void ABarbarianCharacter::ChainsOfRagePressed()
 {
 	if(!bCanUltimate)
 	{
 		return;
 	}
+
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	ChainsOfRageThrowAxe();
+}
+
+void ABarbarianCharacter::ChainsOfRageThrowAxe()
+{
+	FVector BarbarianLocation = GetActorLocation();
+
+	const FVector TraceStart = BarbarianLocation;
+	const FVector AimDirection = followCamera->GetForwardVector().GetSafeNormal();
+	const FVector TraceEnd = TraceStart + (AimDirection * 1000.0f);
+	
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
+
+	FVector ImpactPoint;
+
+	if(bHit)
+	{
+		ImpactPoint = HitResult.ImpactPoint;
+	}
+	else
+	{
+		ImpactPoint = TraceEnd;
+	}
+
+	DrawDebugLine(GetWorld(), TraceStart, ImpactPoint, FColor::White, false, 2.0f);
+	DrawDebugSphere(GetWorld(), ImpactPoint, 20.0f, 12, FColor::Blue, false, 2.0f);
+
+	PostImpactChainsOfRage(ImpactPoint);
+}
+
+void ABarbarianCharacter::PostImpactChainsOfRage(const FVector& ImpactPoint)
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	TArray<FOverlapResult> OverlapResults;
+
+	FCollisionShape AxeImpactSphere = FCollisionShape::MakeSphere(CoRAxeLandingRadius);
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	FCollisionObjectQueryParams ObjectParams;
+	ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
+
+	const bool bFoundEnemies = GetWorld()->OverlapMultiByObjectType(OverlapResults, ImpactPoint, FQuat::Identity, ObjectParams, AxeImpactSphere, QueryParams);
+	if(bFoundEnemies)
+	{
+		for(const auto& OverlapHits : OverlapResults)
+		{
+			AActor* HitActor = OverlapHits.GetActor();
+
+			if(!IsValid(HitActor))
+			{
+				continue;
+			}
+
+			if(!HitActor->Implements<UEnemyInterface>())
+			{
+				continue;
+			}
+
+			if(!IEnemyInterface::Execute_IsEnemyActive(HitActor))
+			{
+				continue;
+			}
+
+			AActor* EnemyActor = IEnemyInterface::Execute_GetEnemyActor(HitActor);
+			if(!IsValid(EnemyActor))
+			{
+				continue;
+			}
+
+			ChainsOfRageTargets.AddUnique(EnemyActor);
+		}
+	}
+}
+
+void ABarbarianCharacter::UpdateChainsOfRageTethers()
+{
+
 }
 
 void ABarbarianCharacter::ResetUltimateThrowCooldown()

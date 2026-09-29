@@ -55,6 +55,23 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 }
 
+//START ENEMY INTERFACING
+AActor* AEnemyCharacter::GetEnemyActor_Implementation()
+{
+	return this;
+}
+
+bool AEnemyCharacter::IsEnemyActive_Implementation()
+{
+	return bPoolActive;
+}
+
+FVector AEnemyCharacter::GetEnemyTargetLocation_Implementation()
+{
+	return GetActorLocation();
+}
+//END ENEMY INTERFACING
+
 //Start Damage Taking Section
 float AEnemyCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {

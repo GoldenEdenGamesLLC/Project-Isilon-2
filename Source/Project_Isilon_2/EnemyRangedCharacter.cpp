@@ -67,6 +67,23 @@ void AEnemyRangedCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 }
 
+//START ENEMY INTERFACING
+AActor* AEnemyRangedCharacter::GetEnemyActor_Implementation()
+{
+	return this;
+}
+
+bool AEnemyRangedCharacter::IsEnemyActive_Implementation()
+{
+	return bPoolActive;
+}
+
+FVector AEnemyRangedCharacter::GetEnemyTargetLocation_Implementation()
+{
+	return GetActorLocation();
+}
+//END ENEMY INTERFACING
+
 void AEnemyRangedCharacter::UpdateRangedMovement()
 {
 	if(!HasAuthority())

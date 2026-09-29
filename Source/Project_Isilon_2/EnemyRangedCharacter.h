@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EnemyInterface.h"
 #include "GameFramework/Character.h"
 #include "EnemyRangedCharacter.generated.h"
 
@@ -11,7 +12,7 @@ class AEnemySpawner;
 class UEnemyAIStats;
 
 UCLASS()
-class PROJECT_ISILON_2_API AEnemyRangedCharacter : public ACharacter
+class PROJECT_ISILON_2_API AEnemyRangedCharacter : public ACharacter, public IEnemyInterface
 {
 	GENERATED_BODY()
 
@@ -165,6 +166,15 @@ public:
 	{
 		OwningSpawner = Spawner;
 	}
+
+	// ===========================================
+	// ENEMY INTERFACE
+	// ===========================================
+	virtual AActor* GetEnemyActor_Implementation() override;
+
+	virtual bool IsEnemyActive_Implementation() override;
+
+	virtual FVector GetEnemyTargetLocation_Implementation() override;
 
 private:
 	UPROPERTY()
