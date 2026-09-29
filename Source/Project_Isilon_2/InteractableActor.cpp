@@ -4,7 +4,7 @@
 #include "InteractableActor.h"
 
 #include "Components/SphereComponent.h"
-#include "CubeCharacter.h"
+#include "BarbarianCharacter.h"
 
 // Sets default values
 AInteractableActor::AInteractableActor()
@@ -38,7 +38,7 @@ void AInteractableActor::Tick(float DeltaTime)
 
 }
 
-void AInteractableActor::Interact_Implementation(ACubeCharacter* InteractingPlayer)
+void AInteractableActor::Interact_Implementation(ABarbarianCharacter* InteractingPlayer)
 {
 	if(!HasAuthority())
 	{
@@ -48,7 +48,7 @@ void AInteractableActor::Interact_Implementation(ACubeCharacter* InteractingPlay
 	UE_LOG(LogTemp, Warning, TEXT("%s interacted with %s"), *GetNameSafe(InteractingPlayer), *GetName());
 }
 
-void AInteractableActor::Interact(ACubeCharacter* InteractingPlayer)
+void AInteractableActor::Interact(ABarbarianCharacter* InteractingPlayer)
 {
 
 }

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
-#include "CubeCharacter.generated.h"
+#include "BarbarianCharacter.generated.h"
 
 class UInputMappingContext;
 class AInteractableActor;
@@ -27,12 +27,12 @@ struct FSphereInteractionParams
 };
 
 UCLASS()
-class PROJECT_ISILON_2_API ACubeCharacter : public ACharacter
+class PROJECT_ISILON_2_API ABarbarianCharacter : public ACharacter
 {
 	GENERATED_BODY()
 	
 public:
-	ACubeCharacter();
+	ABarbarianCharacter();
 	
 	virtual void Tick(float DeltaTime) override;
 
@@ -154,14 +154,20 @@ private:
 	void ResetBasicAttackCooldown();
 
 	// ===========================================
-	// Ultimate - Barbarian
+	// Chains of Rage - Ultimate - Barbarian
 	// ===========================================
 	
 	bool bCanUltimate = true;
 	FTimerHandle UltimateCooldownTimerHandle;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Ultimate Ability")
-	float UltimateThrowRadius = 2000.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float CoRThrowDistance = 5000.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float CoRAxeLandingRadius = 5000.0f;
+	
+	// UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	// float CoRThrowDistance = 5000.0f;
 
 	void UltimateThrowPressed();
 	void ResetUltimateThrowCooldown();
@@ -170,7 +176,7 @@ private:
 	void MulticastUltimateThrowFX(FVector Start, FVector End, bool bHit);
 
 	// ===========================================
-	// Massacre
+	// Massacre - Aggressive Ability - Barbarian
 	// ===========================================
 
 	bool bCanMassacre = true;
@@ -309,6 +315,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="UI")
 	TSubclassOf<UUserWidget> CrosshairWidgetClass;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, Category="UI")
 	TObjectPtr<UUserWidget> CrosshairWidget;
 };

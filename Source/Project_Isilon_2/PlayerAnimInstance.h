@@ -6,7 +6,7 @@
 #include "Animation/AnimInstance.h"
 #include "PlayerAnimInstance.generated.h"
 
-class ACubeCharacter;
+class ABarbarianCharacter;
 class UCharacterMovementComponent;
 
 /**
@@ -25,7 +25,7 @@ public:
 
 private:
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Animation", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<ACubeCharacter> CubeCharacter = nullptr;
+	TObjectPtr<ABarbarianCharacter> BarbarianCharacter = nullptr;
 
 	UPROPERTY(Transient)
 	TObjectPtr<UCharacterMovementComponent> CharacterMovement = nullptr;
@@ -40,5 +40,5 @@ private:
 	bool bIsMoving = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Animation", meta = (AllowPrivateAccess = "true"))
-	float Speed = 0.0f; //ACubeCharacter::GetSpeed();???
+	float Speed = 0.0f; //ABarbarianCharacter::GetSpeed();???
 };

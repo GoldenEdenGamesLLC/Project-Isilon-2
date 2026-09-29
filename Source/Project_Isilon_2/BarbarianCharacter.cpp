@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CubeCharacter.h"
+#include "BarbarianCharacter.h"
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -27,7 +27,7 @@
 #define ECC_Enemy ECC_GameTraceChannel1
 
 // Sets default values
-ACubeCharacter::ACubeCharacter()
+ABarbarianCharacter::ABarbarianCharacter()
 {
 	bReplicates = true;
 	SetReplicateMovement(true);
@@ -77,15 +77,15 @@ ACubeCharacter::ACubeCharacter()
 	charMoveComp->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
 }
 
-void ACubeCharacter::BeginPlay()
+void ABarbarianCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &ACubeCharacter::OnInteractionSphereBeginOverlap);
-	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &ACubeCharacter::OnInteractionSphereEndOverlap);
+	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABarbarianCharacter::OnInteractionSphereBeginOverlap);
+	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &ABarbarianCharacter::OnInteractionSphereEndOverlap);
 }
 
-void ACubeCharacter::PawnClientRestart()
+void ABarbarianCharacter::PawnClientRestart()
 {
 	Super::PawnClientRestart();
 
@@ -129,7 +129,7 @@ void ACubeCharacter::PawnClientRestart()
 	const bool bAdded = CrosshairWidget->AddToPlayerScreen();
 }
 
-void ACubeCharacter::Tick(float DeltaTime)
+void ABarbarianCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -153,32 +153,32 @@ void ACubeCharacter::Tick(float DeltaTime)
 }
 
 // Called to bind functionality to input
-void ACubeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ABarbarianCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ACubeCharacter::Move);
-		EnhancedInputComponent->BindAction(IA_Look, ETriggerEvent::Triggered, this, &ACubeCharacter::Look);
-		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &ACubeCharacter::JumpPressed);
-		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ACubeCharacter::StopJumping);
-		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &ACubeCharacter::DashPressed);
-		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &ACubeCharacter::InteractWithObject);
-		EnhancedInputComponent->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &ACubeCharacter::BasicAttackPressed);
-		EnhancedInputComponent->BindAction(IA_Massacre, ETriggerEvent::Started, this, &ACubeCharacter::MassacrePressed);
-		EnhancedInputComponent->BindAction(IA_Ultimate, ETriggerEvent::Started, this, &ACubeCharacter::UltimateThrowPressed);
+		EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ABarbarianCharacter::Move);
+		EnhancedInputComponent->BindAction(IA_Look, ETriggerEvent::Triggered, this, &ABarbarianCharacter::Look);
+		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &ABarbarianCharacter::JumpPressed);
+		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ABarbarianCharacter::StopJumping);
+		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &ABarbarianCharacter::DashPressed);
+		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &ABarbarianCharacter::InteractWithObject);
+		EnhancedInputComponent->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &ABarbarianCharacter::BasicAttackPressed);
+		EnhancedInputComponent->BindAction(IA_Massacre, ETriggerEvent::Started, this, &ABarbarianCharacter::MassacrePressed);
+		EnhancedInputComponent->BindAction(IA_Ultimate, ETriggerEvent::Started, this, &ABarbarianCharacter::UltimateThrowPressed);
 	}
 }
 
-void ACubeCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void ABarbarianCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ACubeCharacter, CurrentHealth);
+	DOREPLIFETIME(ABarbarianCharacter, CurrentHealth);
 }
 
-void ACubeCharacter::Move(const FInputActionValue& val)
+void ABarbarianCharacter::Move(const FInputActionValue& val)
 {
 	if(!Controller)
 	{
@@ -197,7 +197,7 @@ void ACubeCharacter::Move(const FInputActionValue& val)
 	AddMovementInput(RightVec, movementVec.X);
 }
 
-void ACubeCharacter::Look(const FInputActionValue& val)
+void ABarbarianCharacter::Look(const FInputActionValue& val)
 {
 	const FVector2D value = val.Get<FVector2D>();
 
@@ -206,7 +206,7 @@ void ACubeCharacter::Look(const FInputActionValue& val)
 }
 
 //BEGIN JUMP
-void ACubeCharacter::JumpPressed()
+void ABarbarianCharacter::JumpPressed()
 {
 	if (CanJump() && JumpTotals < JumpMaxCount)
 	{
@@ -215,12 +215,12 @@ void ACubeCharacter::JumpPressed()
 	}
 }
 
-bool ACubeCharacter::CanJumpInternal_Implementation() const
+bool ABarbarianCharacter::CanJumpInternal_Implementation() const
 {
 	return bCanJumpCooldown && Super::CanJumpInternal_Implementation();
 }
 
-void ACubeCharacter::OnJumped_Implementation()
+void ABarbarianCharacter::OnJumped_Implementation()
 {
 	Super::OnJumped_Implementation();
 
@@ -259,14 +259,14 @@ void ACubeCharacter::OnJumped_Implementation()
 	Movement->Velocity.Y = NewHorizontalVelocity.Y;
 }
 
-void ACubeCharacter::Landed(const FHitResult& Hit)
+void ABarbarianCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
-	GetWorldTimerManager().SetTimer(JumpCooldownTimerHandle, this, &ACubeCharacter::ResetJumpCooldown, JumpCooldownTime, false);
+	GetWorldTimerManager().SetTimer(JumpCooldownTimerHandle, this, &ABarbarianCharacter::ResetJumpCooldown, JumpCooldownTime, false);
 }
 
-void ACubeCharacter::ResetJumpCooldown()
+void ABarbarianCharacter::ResetJumpCooldown()
 {
 	JumpTotals = 0;
 	bCanJumpCooldown = true;
@@ -274,7 +274,7 @@ void ACubeCharacter::ResetJumpCooldown()
 //END JUMP
 
 //START DASH
-void ACubeCharacter::DashPressed()
+void ABarbarianCharacter::DashPressed()
 {
 	if(!bCanDash || !followCamera)
 	{
@@ -303,17 +303,17 @@ void ACubeCharacter::DashPressed()
 	}
 	Movement->Velocity = DashDirection * DashStrength;
 
-	// GetWorldTimerManager().SetTimer(DashDurationTimerHandle, this, &ACubeCharacter::HandleDashDamage, DashDuration, false);
-	GetWorldTimerManager().SetTimer(DashDurationTimerHandle, this, &ACubeCharacter::StopDash, DashDuration, false);
-	GetWorldTimerManager().SetTimer(DashCooldownTimerHandle, this, &ACubeCharacter::ResetDashCooldown, DashCooldownTime, false);
+	// GetWorldTimerManager().SetTimer(DashDurationTimerHandle, this, &ABarbarianCharacter::HandleDashDamage, DashDuration, false);
+	GetWorldTimerManager().SetTimer(DashDurationTimerHandle, this, &ABarbarianCharacter::StopDash, DashDuration, false);
+	GetWorldTimerManager().SetTimer(DashCooldownTimerHandle, this, &ABarbarianCharacter::ResetDashCooldown, DashCooldownTime, false);
 }
 
-void ACubeCharacter::ResetDashCooldown()
+void ABarbarianCharacter::ResetDashCooldown()
 {
 	bCanDash = true;
 }
 
-void ACubeCharacter::StopDash()
+void ABarbarianCharacter::StopDash()
 {
 	UCharacterMovementComponent* Movement = GetCharacterMovement();
 	
@@ -340,7 +340,7 @@ void ACubeCharacter::StopDash()
 	damagedActorsByDash.Reset();
 }
 
-void ACubeCharacter::HandleDashDamage()
+void ABarbarianCharacter::HandleDashDamage()
 {
 	if(!HasAuthority())
 	{
@@ -384,12 +384,12 @@ void ACubeCharacter::HandleDashDamage()
 }
 
 //pass through enemies
-void ACubeCharacter::ServerEnterGhostMode_Implementation()
+void ABarbarianCharacter::ServerEnterGhostMode_Implementation()
 {
 	EnterGhostMode();
 }
 
-void ACubeCharacter::EnterGhostMode()
+void ABarbarianCharacter::EnterGhostMode()
 {
 	if(UCapsuleComponent* Capsule = GetCapsuleComponent())
 	{
@@ -401,12 +401,12 @@ void ACubeCharacter::EnterGhostMode()
 	}
 }
 
-void ACubeCharacter::ServerExitGhostMode_Implementation()
+void ABarbarianCharacter::ServerExitGhostMode_Implementation()
 {
 	ExitGhostMode();
 }
 
-void ACubeCharacter::ExitGhostMode()
+void ABarbarianCharacter::ExitGhostMode()
 {
 	if(UCapsuleComponent* Capsule = GetCapsuleComponent())
 	{
@@ -414,7 +414,7 @@ void ACubeCharacter::ExitGhostMode()
 	}
 }
 
-void ACubeCharacter::MulticastDashHandlerFX_Implementation(FVector Start, FVector End, bool bHit)
+void ABarbarianCharacter::MulticastDashHandlerFX_Implementation(FVector Start, FVector End, bool bHit)
 {
 	DrawDebugCapsule(GetWorld(), Start, DashCapsuleHalfHeight, DashDamageStartRadius, FQuat::Identity, FColor::Yellow, false, 1.0f);
 
@@ -423,7 +423,7 @@ void ACubeCharacter::MulticastDashHandlerFX_Implementation(FVector Start, FVecto
 //END DASH
 
 //BEGIN BASIC ATTACK
-void ACubeCharacter::BasicAttackPressed()
+void ABarbarianCharacter::BasicAttackPressed()
 {
 	if(!bCanBasicAttack)
 	{
@@ -442,22 +442,22 @@ void ACubeCharacter::BasicAttackPressed()
 	}
 
 	bCanBasicAttack = false;
-	GetWorldTimerManager().SetTimer(BasicAttackCooldownTimerHandle, this, &ACubeCharacter::BasicAttackCompleted, BasicAttackSpeed, false);
+	GetWorldTimerManager().SetTimer(BasicAttackCooldownTimerHandle, this, &ABarbarianCharacter::BasicAttackCompleted, BasicAttackSpeed, false);
 
 	ServerBasicAttack(AimRotation);
 }
 
-void ACubeCharacter::BasicAttackCompleted()
+void ABarbarianCharacter::BasicAttackCompleted()
 {
 	ResetBasicAttackCooldown();
 }
 
-void ACubeCharacter::ResetBasicAttackCooldown()
+void ABarbarianCharacter::ResetBasicAttackCooldown()
 {
 	bCanBasicAttack = true;
 }
 
-void ACubeCharacter::ServerBasicAttack_Implementation(FRotator AimRotation)
+void ABarbarianCharacter::ServerBasicAttack_Implementation(FRotator AimRotation)
 {
 	if(!bCanBasicAttack)
 	{
@@ -467,7 +467,7 @@ void ACubeCharacter::ServerBasicAttack_Implementation(FRotator AimRotation)
 	PerformBasicAttack(AimRotation);
 }
 
-void ACubeCharacter::PerformBasicAttack(FRotator AimRotation)
+void ABarbarianCharacter::PerformBasicAttack(FRotator AimRotation)
 {
 	if(!HasAuthority())
 	{
@@ -519,10 +519,10 @@ void ACubeCharacter::PerformBasicAttack(FRotator AimRotation)
 
 	MulticastBasicAttackFX(AttackStart, End, bHit);
 
-	GetWorldTimerManager().SetTimer(BasicAttackCooldownTimerHandle, this, &ACubeCharacter::BasicAttackCompleted, BasicAttackSpeed, false);
+	GetWorldTimerManager().SetTimer(BasicAttackCooldownTimerHandle, this, &ABarbarianCharacter::BasicAttackCompleted, BasicAttackSpeed, false);
 }
 
-void ACubeCharacter::MulticastBasicAttackFX_Implementation(FVector AttackStart, FVector End, bool bHit)
+void ABarbarianCharacter::MulticastBasicAttackFX_Implementation(FVector AttackStart, FVector End, bool bHit)
 {
 	DrawDebugCapsule(GetWorld(), AttackStart, BasicAttackHalfHeight, BasicAttackRadius, FQuat::Identity, FColor::Yellow, false, 1.0f);
 
@@ -531,7 +531,7 @@ void ACubeCharacter::MulticastBasicAttackFX_Implementation(FVector AttackStart, 
 //END BASIC ATTACK
 
 // START INTERACTION
-void ACubeCharacter::InteractWithObject(const FInputActionValue& val)
+void ABarbarianCharacter::InteractWithObject(const FInputActionValue& val)
 {
 	if(!NearbyInteractable)
 	{
@@ -548,7 +548,7 @@ void ACubeCharacter::InteractWithObject(const FInputActionValue& val)
 	}
 }
 
-void ACubeCharacter::OnInteractionSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ABarbarianCharacter::OnInteractionSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(!OtherActor || OtherActor == this)
 	{
@@ -577,7 +577,7 @@ void ACubeCharacter::OnInteractionSphereBeginOverlap(UPrimitiveComponent* Overla
 	}
 }
 
-void ACubeCharacter::OnInteractionSphereEndOverlap(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex)
+void ABarbarianCharacter::OnInteractionSphereEndOverlap(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex)
 {
 	if(OtherActor == NearbyInteractable)
 	{
@@ -589,12 +589,12 @@ void ACubeCharacter::OnInteractionSphereEndOverlap(UPrimitiveComponent *Overlapp
 	}
 }
 
-void ACubeCharacter::HandleInteractionOverlap(const FSphereInteractionParams& Params)
+void ABarbarianCharacter::HandleInteractionOverlap(const FSphereInteractionParams& Params)
 {
 	
 }
 
-void ACubeCharacter::ServerInteract_Implementation(AInteractableActor* Interactable)
+void ABarbarianCharacter::ServerInteract_Implementation(AInteractableActor* Interactable)
 {
 	if(!Interactable)
 	{
@@ -612,12 +612,12 @@ void ACubeCharacter::ServerInteract_Implementation(AInteractableActor* Interacta
 }
 
 // START DEFENSE
-void ACubeCharacter::OnRep_CurrentHealth()
+void ABarbarianCharacter::OnRep_CurrentHealth()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] Player Character Current Health - Barbarian = %s health Updated: %.1f"), *GetName(), CurrentHealth);	
 }
 
-float ACubeCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float ABarbarianCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if(!HasAuthority())
 	{
@@ -641,7 +641,7 @@ float ACubeCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 //TODO:
 //1. Fix Character snapping for rotation
 //2. Massacre not resetting
-void ACubeCharacter::MassacrePressed()
+void ABarbarianCharacter::MassacrePressed()
 {
 	if(!bCanMassacre)
 	{
@@ -656,12 +656,12 @@ void ACubeCharacter::MassacrePressed()
 		return;
 	}
 
-	GetWorldTimerManager().SetTimer(MassacreCooldownTimerHandle, this, &ACubeCharacter::ResetMassacreCooldown, MassacreCooldown, false);
+	GetWorldTimerManager().SetTimer(MassacreCooldownTimerHandle, this, &ABarbarianCharacter::ResetMassacreCooldown, MassacreCooldown, false);
 
 	ServerMassacre();
 }
 
-void ACubeCharacter::ServerMassacre_Implementation()
+void ABarbarianCharacter::ServerMassacre_Implementation()
 {
 	if(!bCanMassacre)
 	{
@@ -671,7 +671,7 @@ void ACubeCharacter::ServerMassacre_Implementation()
 	PerformMassacre();
 }
 
-void ACubeCharacter::PerformMassacre()
+void ABarbarianCharacter::PerformMassacre()
 {
 	if(!HasAuthority())
 	{
@@ -729,7 +729,7 @@ void ACubeCharacter::PerformMassacre()
 			{
 				//must use lambda to pass 
 				//GetWorldTimerManager().SetTimer(MassacreAttackTimerHandle, [this, AimRotation]() { this->PerformMassacre(AimRotation); }, MassacreAttackSpeed, false);
-				GetWorldTimerManager().SetTimer(MassacreAttackTimerHandle, this, &ACubeCharacter::PerformMassacre, MassacreAttackSpeed, true);
+				GetWorldTimerManager().SetTimer(MassacreAttackTimerHandle, this, &ABarbarianCharacter::PerformMassacre, MassacreAttackSpeed, true);
 			}
 		}
 	}
@@ -739,12 +739,12 @@ void ACubeCharacter::PerformMassacre()
 	{
 		if(!GetWorldTimerManager().IsTimerActive(MassacreCooldownTimerHandle))
 		{
-			GetWorldTimerManager().SetTimer(MassacreCooldownTimerHandle, this, &ACubeCharacter::ResetMassacreCooldown, MassacreCooldown, false);
+			GetWorldTimerManager().SetTimer(MassacreCooldownTimerHandle, this, &ABarbarianCharacter::ResetMassacreCooldown, MassacreCooldown, false);
 		}
 	}
 }
 
-void ACubeCharacter::ResetMassacreCooldown()
+void ABarbarianCharacter::ResetMassacreCooldown()
 {
 	bCanMassacre = true;
 	MassacreAttackCount = 0;
@@ -753,7 +753,7 @@ void ACubeCharacter::ResetMassacreCooldown()
 	GetWorldTimerManager().ClearTimer(MassacreAttackTimerHandle);
 }
 
-void ACubeCharacter::MulticastMassacreFX_Implementation(FVector Start, FVector End, bool bHit)
+void ABarbarianCharacter::MulticastMassacreFX_Implementation(FVector Start, FVector End, bool bHit)
 {
 	DrawDebugCapsule(GetWorld(), Start, MassacreHalfHeight, MassacreRadius, FQuat::Identity, FColor::Yellow, false, 1.0f);
 
@@ -762,7 +762,7 @@ void ACubeCharacter::MulticastMassacreFX_Implementation(FVector Start, FVector E
 // END Massacre
 
 // BEGIN ULTIMATE
-void ACubeCharacter::UltimateThrowPressed()
+void ABarbarianCharacter::UltimateThrowPressed()
 {
 	if(!bCanUltimate)
 	{
@@ -770,12 +770,12 @@ void ACubeCharacter::UltimateThrowPressed()
 	}
 }
 
-void ACubeCharacter::ResetUltimateThrowCooldown()
+void ABarbarianCharacter::ResetUltimateThrowCooldown()
 {
 
 }
 
-void ACubeCharacter::MulticastUltimateThrowFX_Implementation(FVector Start, FVector End, bool bHit)
+void ABarbarianCharacter::MulticastUltimateThrowFX_Implementation(FVector Start, FVector End, bool bHit)
 {
 
 }

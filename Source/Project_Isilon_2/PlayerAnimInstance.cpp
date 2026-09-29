@@ -3,7 +3,7 @@
 
 #include "PlayerAnimInstance.h"
 
-#include "CubeCharacter.h"
+#include "BarbarianCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 UPlayerAnimInstance::UPlayerAnimInstance()
@@ -15,10 +15,10 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 {
     Super::NativeInitializeAnimation();
 
-    CubeCharacter = Cast<ACubeCharacter>(TryGetPawnOwner());
+    BarbarianCharacter = Cast<ABarbarianCharacter>(TryGetPawnOwner());
 
-    if(IsValid(CubeCharacter)){
-        CharacterMovement = CubeCharacter->GetCharacterMovement();
+    if(IsValid(BarbarianCharacter)){
+        CharacterMovement = BarbarianCharacter->GetCharacterMovement();
     }
 }
 
@@ -26,17 +26,17 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float deltaTime)
 {
     Super::NativeUpdateAnimation(deltaTime);
 
-    if (!IsValid(CubeCharacter))
+    if (!IsValid(BarbarianCharacter))
 	{
-		CubeCharacter = Cast<ACubeCharacter>(TryGetPawnOwner());
+		BarbarianCharacter = Cast<ABarbarianCharacter>(TryGetPawnOwner());
 
-		if (CubeCharacter)
+		if (BarbarianCharacter)
 		{
-			CharacterMovement = CubeCharacter->GetCharacterMovement();
+			CharacterMovement = BarbarianCharacter->GetCharacterMovement();
 		}
 	}
 
-	if (!IsValid(CubeCharacter) || !IsValid(CharacterMovement))
+	if (!IsValid(BarbarianCharacter) || !IsValid(CharacterMovement))
 	{
 		Speed = 0.0f;
 		bIsMoving = false;
@@ -45,7 +45,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float deltaTime)
 		return;
 	}
 
-    FVector HorizontalVelocity = CubeCharacter->GetVelocity();
+    FVector HorizontalVelocity = BarbarianCharacter->GetVelocity();
     HorizontalVelocity.Z = 0.0f;
     Speed = HorizontalVelocity.Size();
     bIsMoving = Speed > 3.0f;
