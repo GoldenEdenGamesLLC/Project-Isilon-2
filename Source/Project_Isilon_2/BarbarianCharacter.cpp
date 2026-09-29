@@ -821,7 +821,10 @@ void ABarbarianCharacter::PostImpactChainsOfRage(const FVector& ImpactPoint)
 
 	TArray<FOverlapResult> OverlapResults;
 
-	FCollisionShape AxeImpactSphere = FCollisionShape::MakeSphere(CoRAxeLandingRadius);
+	FCollisionShape AxeImpactSphere = FCollisionShape::MakeSphere(ChainsOfRageAxeLandingRadius);
+
+	//outlining ChainsOfRageAxeLandingRadius
+	DrawDebugSphere(GetWorld(), ImpactPoint, ChainsOfRageMaxTetherDistance, 12, FColor::Red, false, 6.0f);
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
@@ -858,6 +861,10 @@ void ABarbarianCharacter::PostImpactChainsOfRage(const FVector& ImpactPoint)
 			}
 
 			ChainsOfRageTargets.AddUnique(EnemyActor);
+			UE_LOG(LogTemp, Warning, TEXT("[CHAINS OF RAGE] Captured %s"), *EnemyActor->GetName());
+
+			//TODO::
+			//1. Start timer for Update everything inside of the chains, then do Chains Leap for as long as the tethers are there - 6 or so seconds
 		}
 	}
 }

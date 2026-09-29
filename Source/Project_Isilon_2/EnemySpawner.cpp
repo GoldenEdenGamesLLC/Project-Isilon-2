@@ -181,11 +181,11 @@ void AEnemySpawner::ActivatePooledMelee(UNavigationSystemV1* NavigationSystem)
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Spawner=%s, | NavPoint=%s | Offset=%.2f"), *GetActorLocation().ToString(), *MeleeSpawn.ToString(), SpawnHeightOffsetMelee);
+	//UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Spawner=%s, | NavPoint=%s | Offset=%.2f"), *GetActorLocation().ToString(), *MeleeSpawn.ToString(), SpawnHeightOffsetMelee);
 	const FVector spawnLocation1 = MeleeSpawn + FVector::UpVector * SpawnHeightOffsetMelee;
 	// Spawn the enemy at the calculated location
 
-	UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] CapsuleHalfHeight=%.2f | ActorScale=%s"), MeleeE->GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), *MeleeE->GetActorScale3D().ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] CapsuleHalfHeight=%.2f | ActorScale=%s"), MeleeE->GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), *MeleeE->GetActorScale3D().ToString());
 	MeleeE->ActivateFromPool(spawnLocation1, GetActorRotation(), DifficultyStats, CalculateRuntimeDifficultyCoefficient());
 }
 
@@ -212,7 +212,7 @@ void AEnemySpawner::ReturnMeleeEnemyToPool(AEnemyCharacter* Enemy)
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Returning MeleeEnemy:%s to pool."), *GetNameSafe(Enemy));
+	//UE_LOG(LogTemp, Warning, TEXT("Returning MeleeEnemy:%s to pool."), *GetNameSafe(Enemy));
 	Enemy->DeactivateForPool();
 
 	FTimerHandle RespawnTimerHandle;
@@ -243,7 +243,7 @@ void AEnemySpawner::ActivatePooledRanged(UNavigationSystemV1* NavigationSystem)
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Spawner=%s, | NavPoint=%s | Offset=%.2f"), *GetActorLocation().ToString(), *RangedSpawn.ToString(), SpawnHeightOffsetRanged);
+	//UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Spawner=%s, | NavPoint=%s | Offset=%.2f"), *GetActorLocation().ToString(), *RangedSpawn.ToString(), SpawnHeightOffsetRanged);
 
 	const FVector spawnLocation2 = RangedSpawn + FVector::UpVector * SpawnHeightOffsetRanged;
 
@@ -274,7 +274,7 @@ void AEnemySpawner::ReturnRangedEnemyToPool(AEnemyRangedCharacter* Enemy)
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Returning RangedEnemy:%s to pool."), *GetNameSafe(Enemy));
+	//UE_LOG(LogTemp, Warning, TEXT("Returning RangedEnemy:%s to pool."), *GetNameSafe(Enemy));
 	Enemy->DeactivateForPool();
 
 	FTimerHandle RespawnTimerHandle;
@@ -294,7 +294,7 @@ bool AEnemySpawner::FindValidSpawnLocation(UNavigationSystemV1* NavigationSystem
 	
 	for(int32 i = 0; i < MaxAttempts; ++i)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Attempt=%d starting."), i)
+		//UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Attempt=%d starting."), i)
 
 		FNavLocation NavLocation;
 
@@ -307,7 +307,7 @@ bool AEnemySpawner::FindValidSpawnLocation(UNavigationSystemV1* NavigationSystem
 		}
 
 		const float VerticalDifference = FMath::Abs(NavLocation.Location.Z - SpawnerLocation.Z);
-		UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Attempt=%d | Spawner=%s | NavPoint=%s | VerticalDifference=%.2f"), i, *SpawnerLocation.ToString(), *NavLocation.Location.ToString(), VerticalDifference);
+		//UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Attempt=%d | Spawner=%s | NavPoint=%s | VerticalDifference=%.2f"), i, *SpawnerLocation.ToString(), *NavLocation.Location.ToString(), VerticalDifference);
 
 		if(VerticalDifference > MaxVerticalDifference)
 		{
@@ -413,8 +413,7 @@ float AEnemySpawner::CalculateRuntimeDifficultyCoefficient() const
 
 	const float RuntimeCoefficient = 1.0f + (ElapsedMinutes * DifficultyGrowthPerMinute);
 
-	UE_LOG(LogTemp, Warning, TEXT("[DIFFICULTY] Seconds: %.2f | Minutes: %.2f | GrowthPerMinute: %.2f | RuntimeCoefficient: %.3f"),
-									ElapsedSeconds, ElapsedMinutes, DifficultyGrowthPerMinute, RuntimeCoefficient);
+	//UE_LOG(LogTemp, Warning, TEXT("[DIFFICULTY] Seconds: %.2f | Minutes: %.2f | GrowthPerMinute: %.2f | RuntimeCoefficient: %.3f"), ElapsedSeconds, ElapsedMinutes, DifficultyGrowthPerMinute, RuntimeCoefficient);
 
 	return FMath::Max(RuntimeCoefficient, 1.0f);
 }

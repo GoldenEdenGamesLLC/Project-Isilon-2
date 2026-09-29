@@ -167,16 +167,16 @@ private:
 	FVector ChainsOfRageCenter;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float CoRThrowDistance = 5000.0f;
+	float ChainsOfRageThrowDistance = 5000.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float CoRAxeLandingRadius = 1000.0f;
+	float ChainsOfRageAxeLandingRadius = 1000.0f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float CoRMaxTetherDistance = 1000.0f;
+	float ChainsOfRageMaxTetherDistance = 200.0f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float CoRDuration = 6.0f;
+	float ChainsOfRageDuration = 6.0f;
 
 	void ChainsOfRagePressed();
 	void ResetUltimateThrowCooldown();
