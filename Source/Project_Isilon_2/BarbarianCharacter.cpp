@@ -765,51 +765,62 @@ void ABarbarianCharacter::MulticastMassacreFX_Implementation(FVector Start, FVec
 }
 // END Massacre
 
-// BEGIN ULTIMATE
+// BEGIN ULTIMATE - CHAINS OF RAGE
 void ABarbarianCharacter::ChainsOfRagePressed()
+{
+	if(!bCanUltimate || !followCamera)
+	{
+		return;
+	}
+
+	const FVector AimStart = followCamera->GetComponentLocation();
+	const FVector AimDirection = followCamera->GetForwardVector().GetSafeNormal();
+
+	if(HasAuthority())
+	{
+		ServerChainsOfRage_Implementation(AimStart, AimDirection);
+	}
+	else
+	{
+		ServerChainsOfRage(AimStart, AimDirection);
+	}
+}
+
+void ABarbarianCharacter::ServerChainsOfRage_Implementation(FVector AimStart, FVector AimDirection)
 {
 	if(!bCanUltimate)
 	{
 		return;
 	}
 
-	if(!HasAuthority())
-	{
-		return;
-	}
+	bCanUltimate = false;
 
-	ChainsOfRageThrowAxe();
-}
+	AimDirection = AimDirection.GetSafeNormal();
 
-void ABarbarianCharacter::ChainsOfRageThrowAxe()
-{
-	FVector BarbarianLocation = GetActorLocation();
+	const FVector TraceEnd = AimStart + (AimDirection * ChainsOfRageThrowDistance);
 
-	const FVector TraceStart = BarbarianLocation;
-	const FVector AimDirection = followCamera->GetForwardVector().GetSafeNormal();
-	const FVector TraceEnd = TraceStart + (AimDirection * 1000.0f);
-	
 	FHitResult HitResult;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
 
-	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
 
-	FVector ImpactPoint;
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, AimStart, TraceEnd, ECC_Visibility, QueryParams);
+
+	FVector ImpactPoint = TraceEnd;
 
 	if(bHit)
 	{
 		ImpactPoint = HitResult.ImpactPoint;
 	}
-	else
-	{
-		ImpactPoint = TraceEnd;
-	}
 
-	DrawDebugLine(GetWorld(), TraceStart, ImpactPoint, FColor::White, false, 2.0f);
-	DrawDebugSphere(GetWorld(), ImpactPoint, 20.0f, 12, FColor::Blue, false, 2.0f);
+	ChainsOfRageCenter = ImpactPoint;
+
+	const FVector WeaponStart = GetActorLocation() + FVector(0.0f, 0.0f, 50.0f);
+	MulticastUltimateThrowFX(WeaponStart, ImpactPoint, bHit);
 
 	PostImpactChainsOfRage(ImpactPoint);
+
+	GetWorldTimerManager().SetTimer(UltimateCooldownTimerHandle, this, &ABarbarianCharacter::ResetChainsOfRageCooldown, ChainsOfRageCooldownTime, false);
 }
 
 void ABarbarianCharacter::PostImpactChainsOfRage(const FVector& ImpactPoint)
@@ -819,12 +830,12 @@ void ABarbarianCharacter::PostImpactChainsOfRage(const FVector& ImpactPoint)
 		return;
 	}
 
+	ChainsOfRageCenter = ImpactPoint;
+	ChainsOfRageTargets.Empty();
+
 	TArray<FOverlapResult> OverlapResults;
 
-	FCollisionShape AxeImpactSphere = FCollisionShape::MakeSphere(ChainsOfRageAxeLandingRadius);
-
-	//outlining ChainsOfRageAxeLandingRadius
-	DrawDebugSphere(GetWorld(), ImpactPoint, ChainsOfRageMaxTetherDistance, 12, FColor::Red, false, 6.0f);
+	FCollisionShape AxeImpactSphere = FCollisionShape::MakeSphere(ChainsOfRageMaxTetherDistance);
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
@@ -833,9 +844,12 @@ void ABarbarianCharacter::PostImpactChainsOfRage(const FVector& ImpactPoint)
 	ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
 
 	const bool bFoundEnemies = GetWorld()->OverlapMultiByObjectType(OverlapResults, ImpactPoint, FQuat::Identity, ObjectParams, AxeImpactSphere, QueryParams);
+	
+	DrawDebugSphere(GetWorld(), ImpactPoint, ChainsOfRageMaxTetherDistance, 32, FColor::Red, false, ChainsOfRageDuration);
+	
 	if(bFoundEnemies)
 	{
-		for(const auto& OverlapHits : OverlapResults)
+		for(const FOverlapResult& OverlapHits : OverlapResults)
 		{
 			AActor* HitActor = OverlapHits.GetActor();
 
@@ -862,25 +876,92 @@ void ABarbarianCharacter::PostImpactChainsOfRage(const FVector& ImpactPoint)
 
 			ChainsOfRageTargets.AddUnique(EnemyActor);
 			UE_LOG(LogTemp, Warning, TEXT("[CHAINS OF RAGE] Captured %s"), *EnemyActor->GetName());
-
-			//TODO::
-			//1. Start timer for Update everything inside of the chains, then do Chains Leap for as long as the tethers are there - 6 or so seconds
+			UE_LOG(LogTemp, Warning, TEXT("[CHAINS OF RAGE] ChainsOfRage total targets = %d."), ChainsOfRageTargets.Num());
 		}
 	}
-}
 
-void ABarbarianCharacter::UpdateChainsOfRageTethers()
-{
-
-}
-
-void ABarbarianCharacter::ResetUltimateThrowCooldown()
-{
-
+	GetWorldTimerManager().SetTimer(ChainsOfRageTetherHandle, this, &ABarbarianCharacter::UpdateChainsOfRageTethers, 0.02f, true);
+	GetWorldTimerManager().SetTimer(ChainsOfRageDurationHandle, this, &ABarbarianCharacter::EndChainsOfRage, ChainsOfRageDuration, false);
 }
 
 void ABarbarianCharacter::MulticastUltimateThrowFX_Implementation(FVector Start, FVector End, bool bHit)
 {
-
+	DrawDebugLine(GetWorld(), Start, End, FColor::White, false, 2.0f, 0, 4.0f);
+	DrawDebugSphere(GetWorld(), End, 30.0f, 16, FColor::Blue, false, ChainsOfRageDuration);
 }
-// END ULTIMATE
+
+void ABarbarianCharacter::UpdateChainsOfRageTethers()
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	for(int32 i = ChainsOfRageTargets.Num() - 1; i >= 0; --i)
+	{
+		AActor* Enemy = ChainsOfRageTargets[i];
+
+		if(!IsValid(Enemy))
+		{
+			ChainsOfRageTargets.RemoveAtSwap(i);
+			continue;
+		}
+
+		if(Enemy->Implements<UEnemyInterface>() && !IEnemyInterface::Execute_IsEnemyActive(Enemy))
+		{
+			ChainsOfRageTargets.RemoveAtSwap(i);
+			continue;
+		}
+
+		const FVector EnemyLocation = Enemy->GetActorLocation();
+		FVector ToEnemy = EnemyLocation - ChainsOfRageCenter;
+
+		ToEnemy.Z = 0.0f;
+
+		const float DistanceFromCenter = ToEnemy.Size();
+		const float TetherBoundary = ChainsOfRageTetherGraceDistance + ChainsOfRageMaxTetherDistance;
+
+		if(DistanceFromCenter <= TetherBoundary)
+		{
+			continue;
+		}
+
+		const FVector DirectionFromCenter = ToEnemy.GetSafeNormal();
+		const FVector DirectionToCenter = -DirectionFromCenter;
+
+		if(ACharacter* EnemyCharacter = Cast<ACharacter>(Enemy))
+		{
+			if(UCharacterMovementComponent* Movement = EnemyCharacter->GetCharacterMovement())
+			{
+				const float Overshoot = DistanceFromCenter - ChainsOfRageMaxTetherDistance;
+				const float PullStrength = FMath::Clamp(Overshoot * ChainsOfRageTetherPullStrength, 300.0f, 1200.0f);
+
+				FVector CurrentVelocity = Movement->Velocity;
+				FVector DesiredVelocity = DirectionToCenter * PullStrength;
+
+				DesiredVelocity.Z = CurrentVelocity.Z;
+				Movement->Velocity = FMath::VInterpTo(CurrentVelocity, DesiredVelocity, 0.05f, 8.0f);
+			}
+		}
+	}
+}
+
+void ABarbarianCharacter::EndChainsOfRage()
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	GetWorldTimerManager().ClearTimer(ChainsOfRageTetherHandle);
+	GetWorldTimerManager().ClearTimer(ChainsOfRageDurationHandle);
+	
+	ChainsOfRageTargets.Empty();
+	UE_LOG(LogTemp, Warning, TEXT("[CHAINS OF RAGE] Tether's released."))
+}
+
+void ABarbarianCharacter::ResetChainsOfRageCooldown()
+{
+	bCanUltimate = true;
+}
+// END ULTIMATE - CHAINS OF RAGE

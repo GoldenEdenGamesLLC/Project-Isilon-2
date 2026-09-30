@@ -159,7 +159,8 @@ private:
 	
 	bool bCanUltimate = true;
 	FTimerHandle UltimateCooldownTimerHandle;
-	FTimerHandle ChainsOfRageTetherDuration;
+	FTimerHandle ChainsOfRageTetherHandle;
+	FTimerHandle ChainsOfRageDurationHandle;
 
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> ChainsOfRageTargets;
@@ -170,24 +171,33 @@ private:
 	float ChainsOfRageThrowDistance = 5000.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float ChainsOfRageAxeLandingRadius = 1000.0f;
+	float ChainsOfRageTetherPullStrength = 5.0f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
 	float ChainsOfRageMaxTetherDistance = 200.0f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float ChainsOfRageDuration = 6.0f;
+	float ChainsOfRageDuration = 3.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageCooldownTime = 3.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageTetherGraceDistance = 50.0f;
 
 	void ChainsOfRagePressed();
-	void ResetUltimateThrowCooldown();
+	void ResetChainsOfRageCooldown();
 
-	void ChainsOfRageThrowAxe();
+	UFUNCTION(Server, Reliable)
+	void ServerChainsOfRage(FVector AimStart, FVector AimDirection);
 
 	void PostImpactChainsOfRage(const FVector& ImpactPoint);
 	void UpdateChainsOfRageTethers();
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastUltimateThrowFX(FVector Start, FVector End, bool bHit);
+
+	void EndChainsOfRage();
 
 	// ===========================================
 	// Massacre - Aggressive Ability - Barbarian

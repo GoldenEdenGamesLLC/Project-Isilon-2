@@ -311,7 +311,7 @@ bool AEnemySpawner::FindValidSpawnLocation(UNavigationSystemV1* NavigationSystem
 
 		if(VerticalDifference > MaxVerticalDifference)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Rejected nav point - vertical difference > 500."));
+			UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Rejected nav point - vertical difference > 800."));
 			continue;
 		}
 	

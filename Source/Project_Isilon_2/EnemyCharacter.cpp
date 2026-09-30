@@ -269,7 +269,7 @@ void AEnemyCharacter::PerformAttack(AActor* Target)
 	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, 50.0f);
 	const FVector End = Target->GetActorLocation() + FVector(0.0f, 0.0f, 50.0f);
 
-	UE_LOG(LogTemp, Warning, TEXT("[MELEE ENEMY ATTACK] %s attacked %s for %.1f damage."), *GetName(), *Target->GetName(), Damage);
+	//UE_LOG(LogTemp, Warning, TEXT("[MELEE ENEMY ATTACK] %s attacked %s for %.1f damage."), *GetName(), *Target->GetName(), Damage);
 	UGameplayStatics::ApplyDamage(Target, Damage, GetController(), this, UDamageType::StaticClass());
 	MulticastAttackVFX(Start, End, true);
 }
