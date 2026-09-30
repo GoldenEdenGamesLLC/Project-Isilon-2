@@ -268,6 +268,13 @@ void ABarbarianCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	GetWorldTimerManager().SetTimer(JumpCooldownTimerHandle, this, &ABarbarianCharacter::ResetJumpCooldown, JumpCooldownTime, false);
+
+	if(HasAuthority() && bChainsOfRageReactivationActive)
+	{
+		bChainsOfRageReactivationActive = false;
+
+		ChainsOfRageSlam();
+	}
 }
 
 void ABarbarianCharacter::ResetJumpCooldown()
@@ -768,7 +775,7 @@ void ABarbarianCharacter::MulticastMassacreFX_Implementation(FVector Start, FVec
 // BEGIN ULTIMATE - CHAINS OF RAGE
 void ABarbarianCharacter::ChainsOfRagePressed()
 {
-	if(!bCanUltimate || !followCamera)
+	if(!followCamera)
 	{
 		return;
 	}
@@ -778,12 +785,28 @@ void ABarbarianCharacter::ChainsOfRagePressed()
 
 	if(HasAuthority())
 	{
-		ServerChainsOfRage_Implementation(AimStart, AimDirection);
+		ServerChainsOfRagePressed_Implementation(AimStart, AimDirection);
 	}
 	else
 	{
-		ServerChainsOfRage(AimStart, AimDirection);
+		ServerChainsOfRagePressed(AimStart, AimDirection);
 	}
+}
+
+void ABarbarianCharacter::ServerChainsOfRagePressed_Implementation(FVector AimStart, FVector AimDirection)
+{
+	if(bChainsOfRageActive)
+	{
+		ChainsOfRageReactivation();
+		return;
+	}
+
+	if(!bCanUltimate)
+	{
+		return;
+	}
+
+	ServerChainsOfRage_Implementation(AimStart, AimDirection);
 }
 
 void ABarbarianCharacter::ServerChainsOfRage_Implementation(FVector AimStart, FVector AimDirection)
@@ -829,6 +852,8 @@ void ABarbarianCharacter::PostImpactChainsOfRage(const FVector& ImpactPoint)
 	{
 		return;
 	}
+
+	bChainsOfRageActive = true;
 
 	ChainsOfRageCenter = ImpactPoint;
 	ChainsOfRageTargets.Empty();
@@ -944,6 +969,119 @@ void ABarbarianCharacter::UpdateChainsOfRageTethers()
 			}
 		}
 	}
+
+	DrawDebugSphere(GetWorld(), ChainsOfRageCenter, ChainsOfRageReactivationRadius, 48, FColor::Orange, false, 2.0f);
+}
+
+void ABarbarianCharacter::ChainsOfRageReactivation()
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	if(!bChainsOfRageActive)
+	{
+		return;
+	}
+
+	if(bChainsOfRageReactivationActive)
+	{
+		return;
+	}
+
+	GetWorldTimerManager().ClearTimer(ChainsOfRageDurationHandle);
+
+	FVector CenterOfChainsOfRage = ChainsOfRageCenter - GetActorLocation();
+	CenterOfChainsOfRage.Z = 0.0f;
+	
+	const FVector DirectionToCenter = CenterOfChainsOfRage.GetSafeNormal();
+
+	FVector LaunchVelocity = DirectionToCenter * ChainsOfRageReactivationLaunchSpeed;
+	LaunchVelocity.Z = ChainsOfRageReactivationJumpZVelocity;
+
+	bChainsOfRageReactivationActive = true;
+	LaunchCharacter(LaunchVelocity, true, true);
+}
+
+void ABarbarianCharacter::ChainsOfRageSlam()
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	const FVector SlamCenter = GetActorLocation();
+
+	TArray<FOverlapResult> OverlapResults;
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	FCollisionObjectQueryParams ObjectParams;
+	ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
+
+	const FCollisionShape SlamSphere = FCollisionShape::MakeSphere(ChainsOfRageReactivationRadius);
+	const bool bFoundEnemies = GetWorld()->OverlapMultiByObjectType(OverlapResults, SlamCenter, FQuat::Identity, ObjectParams, SlamSphere, QueryParams);
+
+	if(!bFoundEnemies)
+	{
+		return;
+	}
+
+	for(const FOverlapResult& OverlapHits : OverlapResults)
+	{
+		AActor* HitActor = OverlapHits.GetActor();
+
+		if(!IsValid(HitActor))
+		{
+			continue;
+		}
+
+		if(!HitActor->Implements<UEnemyInterface>())
+		{
+			continue;
+		}
+
+		if(!IEnemyInterface::Execute_IsEnemyActive(HitActor))
+		{
+			continue;
+		}
+
+		AActor* EnemyActor = IEnemyInterface::Execute_GetEnemyActor(HitActor);
+		if(!IsValid(EnemyActor))
+		{
+			continue;
+		}
+
+		//damage
+		UGameplayStatics::ApplyDamage(EnemyActor, ChainsOfRageReactivationBaseDamage, GetController(), this, UDamageType::StaticClass());
+
+		//launch
+		if(ACharacter* EnemyCharacter = Cast<ACharacter>(EnemyActor))
+		{
+			FVector KnockbackDirection = EnemyActor->GetActorLocation() - SlamCenter;
+
+			KnockbackDirection.Z = 0.0f;
+
+			if(KnockbackDirection.IsNearlyZero())
+			{
+				KnockbackDirection = GetActorForwardVector();
+			}
+			else
+			{
+				KnockbackDirection.Normalize();
+			}
+
+			FVector LaunchVelocity = KnockbackDirection * ChainsOfRageEnemyLaunchStrength;
+
+			LaunchVelocity.Z = ChainsOfRageEnemyLaunchZStrength;
+			EnemyCharacter->LaunchCharacter(LaunchVelocity, true, true);
+		}
+	}
+
+	bChainsOfRageActive = false;
+	EndChainsOfRage();
 }
 
 void ABarbarianCharacter::EndChainsOfRage()
@@ -956,6 +1094,9 @@ void ABarbarianCharacter::EndChainsOfRage()
 	GetWorldTimerManager().ClearTimer(ChainsOfRageTetherHandle);
 	GetWorldTimerManager().ClearTimer(ChainsOfRageDurationHandle);
 	
+	bChainsOfRageActive = false;
+	bChainsOfRageReactivationActive = false;
+
 	ChainsOfRageTargets.Empty();
 	UE_LOG(LogTemp, Warning, TEXT("[CHAINS OF RAGE] Tether's released."))
 }

@@ -158,6 +158,8 @@ private:
 	// ===========================================
 	
 	bool bCanUltimate = true;
+	bool bChainsOfRageActive = false;
+	bool bChainsOfRageReactivationActive = false;
 	FTimerHandle UltimateCooldownTimerHandle;
 	FTimerHandle ChainsOfRageTetherHandle;
 	FTimerHandle ChainsOfRageDurationHandle;
@@ -185,7 +187,29 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
 	float ChainsOfRageTetherGraceDistance = 50.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageReactivationBaseDamage = 80.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageReactivationLaunchSpeed = 1800.0f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageReactivationJumpZVelocity = 800.0f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageEnemyLaunchStrength = 1600.0f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageEnemyLaunchZStrength = 450.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageReactivationRadius = 3000.0f;
+
 	void ChainsOfRagePressed();
+
+	UFUNCTION(Server, Reliable)
+	void ServerChainsOfRagePressed(FVector AimStart, FVector AimDirection);
+
 	void ResetChainsOfRageCooldown();
 
 	UFUNCTION(Server, Reliable)
@@ -193,6 +217,10 @@ private:
 
 	void PostImpactChainsOfRage(const FVector& ImpactPoint);
 	void UpdateChainsOfRageTethers();
+
+	void ChainsOfRageReactivation();
+	
+	void ChainsOfRageSlam();
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastUltimateThrowFX(FVector Start, FVector End, bool bHit);
