@@ -22,7 +22,8 @@ public:
 	void PauseForPooling();
 	void ResumeFromPooling();
 	void SetActiveJumpLink(AJumpNavLinkProxy* JumpLink);
-
+	void SetCrowdControlActive(bool bActive);
+	
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
@@ -37,7 +38,14 @@ private:
 	void StopChasing();
 
 private:
-	//the distance at which an enemy will stop chasing a player
+	// ===========================================
+	// Crowd Control
+	// ===========================================
+	bool bCrowdControlActive = false;
+
+	// ===========================================
+	// Pathing
+	// ===========================================
 	UPROPERTY(EditDefaultsOnly, Category="AI|Chase", meta = (ClampMin = "0.0"))
 	float LoseDistance = 10000.0f;
 

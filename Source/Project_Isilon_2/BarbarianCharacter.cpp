@@ -13,18 +13,21 @@
 #include "GameFramework/PlayerController.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/Controller.h"
+#include "GameFramework/Character.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/OverlapResult.h"
 #include "Net/UnrealNetwork.h"
 #include "InputActionValue.h"
+#include "AIController.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 
 #include "Blueprint/UserWidget.h"
 #include "DrawDebugHelpers.h"
 
+#include "EnemyAIController.h"
 #include "EnemyInterface.h"
 
 //ignores players and focuses on enemies when dashing
@@ -271,9 +274,6 @@ void ABarbarianCharacter::Landed(const FHitResult& Hit)
 
 	if(HasAuthority() && bChainsOfRageReactivationActive)
 	{
-		//bChainsOfRageActive = true;
-		//bChainsOfRageReactivationActive = false;
-
 		ChainsOfRageSlam();
 	}
 }
@@ -796,7 +796,7 @@ void ABarbarianCharacter::ChainsOfRagePressed()
 
 void ABarbarianCharacter::ServerChainsOfRagePressed_Implementation(FVector AimStart, FVector AimDirection)
 {
-	UE_LOG(LogTemp, Error, TEXT("[CHAINS OF RAGE DEBUG] bChainsOfRageReactivation=%s | bChainsOfRageActive=%s |"), (bChainsOfRageReactivationActive ? TEXT("true") : TEXT("false")), (bChainsOfRageActive ? TEXT("true") : TEXT("false")));
+	//UE_LOG(LogTemp, Error, TEXT("[CHAINS OF RAGE DEBUG] bChainsOfRageReactivation=%s | bChainsOfRageActive=%s |"), (bChainsOfRageReactivationActive ? TEXT("true") : TEXT("false")), (bChainsOfRageActive ? TEXT("true") : TEXT("false")));
 
 	if(bChainsOfRageReactivationActive && bChainsOfRageActive)
 	{
@@ -1015,6 +1015,7 @@ void ABarbarianCharacter::ChainsOfRageReactivation()
 	LaunchVelocity.Z = ChainsOfRageReactivationJumpZVelocity;
 
 	bChainsOfRageReactivationActive = true;
+
 	LaunchCharacter(LaunchVelocity, true, true);
 }
 
@@ -1074,27 +1075,123 @@ void ABarbarianCharacter::ChainsOfRageSlam()
 		//launch
 		if(ACharacter* EnemyCharacter = Cast<ACharacter>(EnemyActor))
 		{
-			FVector KnockbackDirection = EnemyActor->GetActorLocation() - SlamCenter;
-
-			KnockbackDirection.Z = 0.0f;
-
-			if(KnockbackDirection.IsNearlyZero())
-			{
-				KnockbackDirection = GetActorForwardVector();
-			}
-			else
-			{
-				KnockbackDirection.Normalize();
-			}
-
-			FVector LaunchVelocity = KnockbackDirection * ChainsOfRageEnemyLaunchStrength;
-
-			LaunchVelocity.Z = ChainsOfRageEnemyLaunchZStrength;
-			EnemyCharacter->LaunchCharacter(LaunchVelocity, true, true);
+			StartChainsOfRageKnockback(EnemyCharacter, SlamCenter);
 		}
 	}
 
 	EndChainsOfRage();
+}
+
+void ABarbarianCharacter::StartChainsOfRageKnockback(ACharacter* EnemyCharacter, const FVector& SlamCenter)
+{
+	if(!HasAuthority() || !IsValid(EnemyCharacter))
+	{
+		return;
+	}
+
+	FVector KnockbackDirection = EnemyCharacter->GetActorLocation() - SlamCenter;
+	//UE_LOG(LogTemp, Error, TEXT("[CHAINS OF RAGE DEBUG] KnockbackDirection = %s"), *KnockbackDirection.ToString());
+	KnockbackDirection.Z = 0.0f;
+
+	if(KnockbackDirection.IsNearlyZero())
+	{
+		KnockbackDirection = GetActorForwardVector();
+	}
+	else
+	{
+		KnockbackDirection.Normalize();
+	}
+
+	if(AAIController* AIController = Cast<AAIController>(EnemyCharacter->GetController()))
+	{
+		AIController->StopMovement();
+	}
+
+	if(AEnemyAIController* AIController = Cast<AEnemyAIController>(EnemyCharacter->GetController()))
+	{
+		AIController->SetCrowdControlActive(true);
+	}
+
+	if(UCharacterMovementComponent* Movement = EnemyCharacter->GetCharacterMovement())
+	{
+		Movement->StopMovementImmediately();
+		Movement->Velocity = FVector::ZeroVector;
+		Movement->SetMovementMode(MOVE_Flying);
+	}
+
+	FChainsOfRageKnockbackData Data;
+
+	Data.Character = EnemyCharacter;
+	Data.StartLocation = EnemyCharacter->GetActorLocation();
+
+	Data.TargetLocation = Data.StartLocation + (KnockbackDirection * ChainsOfRageKnockbackDistance);
+	Data.ElapsedTime = 0.0f;
+	Data.Duration = ChainsOfRageKnockbackDuration;
+	Data.ArcHeight = ChainsOfRageKnockbackArcHeight;
+
+	ChainsOfRageKnockbackEnemies.Add(Data);
+
+	if(!GetWorldTimerManager().IsTimerActive(ChainsOfRageKnockbackTimerHandle))
+	{
+		GetWorldTimerManager().SetTimer(ChainsOfRageKnockbackTimerHandle, this, &ABarbarianCharacter::UpdateChainsOfRageKnockback, ChainsOfRageKnockbackUpdateRate, true);
+	}
+}
+
+void ABarbarianCharacter::UpdateChainsOfRageKnockback()
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	const float DeltaTime = GetWorld()->GetDeltaSeconds();
+
+	for(int32 i = ChainsOfRageKnockbackEnemies.Num() - 1; i >= 0; --i)
+	{
+		FChainsOfRageKnockbackData& Data = ChainsOfRageKnockbackEnemies[i];
+
+		if(!IsValid(Data.Character))
+		{
+			ChainsOfRageKnockbackEnemies.RemoveAtSwap(i);
+			continue;
+		}
+
+		Data.ElapsedTime += DeltaTime;
+
+		//Arc for slam knockback for Chains of Rage
+		//Position = Lerp(Start, End, Alpha)
+		//Position.Z += 4 * ArcHeight * Alpha * (1 - Alpha)
+		const float Alpha = FMath::Clamp(Data.ElapsedTime / Data.Duration, 0.0f, 1.0f);
+		FVector NewLocation = FMath::Lerp(Data.StartLocation, Data.TargetLocation, Alpha);
+
+		const float ArcOffset = 4.0f * Data.ArcHeight * Alpha * (1.0f - Alpha);
+		NewLocation.Z += ArcOffset;
+
+		FHitResult HitResult;
+
+		Data.Character->SetActorLocation(NewLocation, true, &HitResult, ETeleportType::None);
+
+		//landed
+		if(Alpha >= 1.0f)
+		{
+			if(UCharacterMovementComponent* Movement = Data.Character->GetCharacterMovement())
+			{
+				Movement->SetMovementMode(MOVE_Walking);
+				Movement->StopMovementImmediately();
+			}
+
+			if(AEnemyAIController* EnemyController = Cast<AEnemyAIController>(Data.Character->GetController()))
+			{
+				EnemyController->SetCrowdControlActive(false);
+			}
+			ChainsOfRageKnockbackEnemies.RemoveAtSwap(i);
+		}
+	}
+
+	if(ChainsOfRageKnockbackEnemies.IsEmpty())
+	{
+		GetWorldTimerManager().ClearTimer(ChainsOfRageKnockbackTimerHandle);
+	}
 }
 
 void ABarbarianCharacter::EndChainsOfRage()

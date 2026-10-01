@@ -12,6 +12,7 @@ class AInteractableActor;
 class USphereComponent;
 class UInputAction;
 class UUserWidget;
+class ACharacter;
 
 struct FInputActionInstance;
 struct FInputActionValue;
@@ -24,6 +25,22 @@ struct FSphereInteractionParams
 	int32 OtherBodyIndex = INDEX_NONE;
 	bool bFromSweep = false;
 	FHitResult SweepResult;
+};
+
+USTRUCT()
+struct FChainsOfRageKnockbackData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TObjectPtr<ACharacter> Character = nullptr;
+
+	FVector StartLocation = FVector::ZeroVector;
+	FVector TargetLocation = FVector::ZeroVector;
+
+	float ElapsedTime = 0.0f;
+	float Duration = 0.6f;
+	float ArcHeight = 300.0f;
 };
 
 UCLASS()
@@ -163,9 +180,13 @@ private:
 	FTimerHandle UltimateCooldownTimerHandle;
 	FTimerHandle ChainsOfRageTetherHandle;
 	FTimerHandle ChainsOfRageDurationHandle;
+	FTimerHandle ChainsOfRageKnockbackTimerHandle;
 
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> ChainsOfRageTargets;
+
+	UPROPERTY()
+	TArray<FChainsOfRageKnockbackData> ChainsOfRageKnockbackEnemies;
 
 	FVector ChainsOfRageCenter;
 
@@ -207,6 +228,18 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
 	float ChainsOfRageSlamAffectedArea = 750.0f;
+		
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageKnockbackDistance = 250.0f;	
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageKnockbackArcHeight = 150.0f;	
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageKnockbackDuration = 1.5f;	
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageKnockbackUpdateRate = 0.016f;
 
 	void ChainsOfRagePressed();
 
@@ -222,8 +255,10 @@ private:
 	void UpdateChainsOfRageTethers();
 
 	void ChainsOfRageReactivation();
-	
 	void ChainsOfRageSlam();
+	
+	void StartChainsOfRageKnockback(ACharacter* EnemyCharacter, const FVector& SlamCenter);
+	void UpdateChainsOfRageKnockback();
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastUltimateThrowFX(FVector Start, FVector End, bool bHit);
