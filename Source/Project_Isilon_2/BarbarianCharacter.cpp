@@ -271,7 +271,8 @@ void ABarbarianCharacter::Landed(const FHitResult& Hit)
 
 	if(HasAuthority() && bChainsOfRageReactivationActive)
 	{
-		bChainsOfRageReactivationActive = false;
+		//bChainsOfRageActive = true;
+		//bChainsOfRageReactivationActive = false;
 
 		ChainsOfRageSlam();
 	}
@@ -795,6 +796,19 @@ void ABarbarianCharacter::ChainsOfRagePressed()
 
 void ABarbarianCharacter::ServerChainsOfRagePressed_Implementation(FVector AimStart, FVector AimDirection)
 {
+	UE_LOG(LogTemp, Error, TEXT("[CHAINS OF RAGE DEBUG] bChainsOfRageReactivation=%s | bChainsOfRageActive=%s |"), (bChainsOfRageReactivationActive ? TEXT("true") : TEXT("false")), (bChainsOfRageActive ? TEXT("true") : TEXT("false")));
+
+	if(bChainsOfRageReactivationActive && bChainsOfRageActive)
+	{
+		EndChainsOfRage();
+		return;
+	}
+
+	if(bChainsOfRageReactivationActive)
+	{
+		return;
+	}
+
 	if(bChainsOfRageActive)
 	{
 		ChainsOfRageReactivation();
@@ -1021,7 +1035,7 @@ void ABarbarianCharacter::ChainsOfRageSlam()
 	FCollisionObjectQueryParams ObjectParams;
 	ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
 
-	const FCollisionShape SlamSphere = FCollisionShape::MakeSphere(ChainsOfRageReactivationRadius);
+	const FCollisionShape SlamSphere = FCollisionShape::MakeSphere(ChainsOfRageSlamAffectedArea);
 	const bool bFoundEnemies = GetWorld()->OverlapMultiByObjectType(OverlapResults, SlamCenter, FQuat::Identity, ObjectParams, SlamSphere, QueryParams);
 
 	if(!bFoundEnemies)
@@ -1080,7 +1094,6 @@ void ABarbarianCharacter::ChainsOfRageSlam()
 		}
 	}
 
-	bChainsOfRageActive = false;
 	EndChainsOfRage();
 }
 

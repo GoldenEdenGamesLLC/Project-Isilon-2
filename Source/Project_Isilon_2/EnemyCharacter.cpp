@@ -87,7 +87,7 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const&
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	MeleeEnemyCurrentHealth = FMath::Clamp(MeleeEnemyCurrentHealth - ActualDamage, 0.0f, MaxHealth);
-	UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), ActualDamage, MeleeEnemyCurrentHealth);
+	//UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), ActualDamage, MeleeEnemyCurrentHealth);
 
 	if(MeleeEnemyCurrentHealth <= 0.0f)
 	{
@@ -104,7 +104,7 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const&
 
 void AEnemyCharacter::OnRep_MeleeEnemyCurrentHealth()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] MeleeEnemyCurrentHealth = %s health Updated: %.1f"), *GetName(), MeleeEnemyCurrentHealth);
+	//UE_LOG(LogTemp, Warning, TEXT("[CLIENT] MeleeEnemyCurrentHealth = %s health Updated: %.1f"), *GetName(), MeleeEnemyCurrentHealth);
 	
 	//TODO:
 	//1. Hit Reaction (Knockback, hit reaction)
@@ -112,7 +112,7 @@ void AEnemyCharacter::OnRep_MeleeEnemyCurrentHealth()
 
 void AEnemyCharacter::OnRep_MaxHealth()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] MaxHealth = %s health Updated: %.1f"), *GetName(), MaxHealth);
+	//UE_LOG(LogTemp, Warning, TEXT("[CLIENT] MaxHealth = %s health Updated: %.1f"), *GetName(), MaxHealth);
 }
 
 void AEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

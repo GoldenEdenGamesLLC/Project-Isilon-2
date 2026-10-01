@@ -120,7 +120,7 @@ void AEnemySpawner::InitializePools()
 		RangedEnemyPool.Add(Enemy);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[POOL] created %d melee and %d ranged enemies."), MeleeEnemyPool.Num(), RangedEnemyPool.Num());
+	//UE_LOG(LogTemp, Warning, TEXT("[POOL] created %d melee and %d ranged enemies."), MeleeEnemyPool.Num(), RangedEnemyPool.Num());
 }
 
 void AEnemySpawner::SpawnWave()
@@ -311,7 +311,7 @@ bool AEnemySpawner::FindValidSpawnLocation(UNavigationSystemV1* NavigationSystem
 
 		if(VerticalDifference > MaxVerticalDifference)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Rejected nav point - vertical difference > 800."));
+			//UE_LOG(LogTemp, Warning, TEXT("[SPAWN DEBUG] Rejected nav point - vertical difference > 800."));
 			continue;
 		}
 	
