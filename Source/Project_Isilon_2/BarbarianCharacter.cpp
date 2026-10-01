@@ -271,11 +271,6 @@ void ABarbarianCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	GetWorldTimerManager().SetTimer(JumpCooldownTimerHandle, this, &ABarbarianCharacter::ResetJumpCooldown, JumpCooldownTime, false);
-
-	if(HasAuthority() && bChainsOfRageReactivationActive)
-	{
-		ChainsOfRageSlam();
-	}
 }
 
 void ABarbarianCharacter::ResetJumpCooldown()
@@ -409,7 +404,7 @@ void ABarbarianCharacter::EnterGhostMode()
 		Capsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 
 		const ECollisionResponse response = Capsule->GetCollisionResponseToChannel(ECC_Pawn);
-		UE_LOG(LogTemp, Warning, TEXT("[%s] ENTER GHOST | %s | Pawn=%d"), HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"), *GetName(), (int32)Capsule->GetCollisionResponseToChannel(ECC_Pawn));
+		//UE_LOG(LogTemp, Warning, TEXT("[%s] ENTER GHOST | %s | Pawn=%d"), HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"), *GetName(), (int32)Capsule->GetCollisionResponseToChannel(ECC_Pawn));
 	}
 }
 
@@ -638,7 +633,7 @@ float ABarbarianCharacter::TakeDamage(float DamageAmount, struct FDamageEvent co
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	CurrentHealth = FMath::Clamp(CurrentHealth - ActualDamage, 0.0f, MaxHealth);
-	UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), ActualDamage, CurrentHealth);
+	//UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), ActualDamage, CurrentHealth);
 
 	if(CurrentHealth <= 0.0f)
 	{
@@ -650,9 +645,6 @@ float ABarbarianCharacter::TakeDamage(float DamageAmount, struct FDamageEvent co
 // END DEFENSE
 
 // BEGIN Massacre
-//TODO:
-//1. Fix Character snapping for rotation
-//2. Massacre not resetting
 void ABarbarianCharacter::MassacrePressed()
 {
 	if(!bCanMassacre)
@@ -1004,19 +996,71 @@ void ABarbarianCharacter::ChainsOfRageReactivation()
 		return;
 	}
 
-	GetWorldTimerManager().ClearTimer(ChainsOfRageDurationHandle);
-
-	FVector CenterOfChainsOfRage = ChainsOfRageCenter - GetActorLocation();
-	CenterOfChainsOfRage.Z = 0.0f;
-	
-	const FVector DirectionToCenter = CenterOfChainsOfRage.GetSafeNormal();
-
-	FVector LaunchVelocity = DirectionToCenter * ChainsOfRageReactivationLaunchSpeed;
-	LaunchVelocity.Z = ChainsOfRageReactivationJumpZVelocity;
-
 	bChainsOfRageReactivationActive = true;
+	ChainsOfRageLeapStart = GetActorLocation();
+	ChainsOfRageLeapTarget = ChainsOfRageCenter;
 
-	LaunchCharacter(LaunchVelocity, true, true);
+	//Change Jump Totals to not change the Velocity or the movement within the leap
+	JumpTotals = 2;
+
+	EnterGhostMode();
+	if(!HasAuthority())
+	{
+		ServerEnterGhostMode();
+	}
+
+	ChainsOfRageLeapElapsedTime = 0.0f;
+
+	if(UCharacterMovementComponent* Movement = GetCharacterMovement())
+	{
+		Movement->StopMovementImmediately();
+		Movement->Velocity = FVector::ZeroVector;
+		Movement->SetMovementMode(MOVE_Flying);
+	}
+
+	GetWorldTimerManager().SetTimer(ChainsOfRageLeapTimerHandle, this, &ABarbarianCharacter::UpdateChainsOfRageLeap, ChainsOfRageLeapUpdateRate, true);
+}
+
+void ABarbarianCharacter::UpdateChainsOfRageLeap()
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	const float DeltaTime = GetWorld()->GetDeltaSeconds();
+	ChainsOfRageLeapElapsedTime += DeltaTime;
+
+	const float Alpha = FMath::Clamp(ChainsOfRageLeapElapsedTime / ChainsOfRageLeapDuration, 0.0f, 1.0f);
+	
+	FVector NewLocation = FMath::Lerp(ChainsOfRageLeapStart, ChainsOfRageLeapTarget, Alpha);
+	
+	const float ArcOffset = 4.0f * ChainsOfRageLeapArcHeight * Alpha * (1.0f - Alpha);
+	NewLocation.Z += ArcOffset;
+
+	SetActorLocation(NewLocation, true, nullptr, ETeleportType::None);
+
+	//end of CoR launch
+	if(Alpha >= 1.0f)
+	{
+		GetWorldTimerManager().ClearTimer(ChainsOfRageLeapTimerHandle);
+		if(UCharacterMovementComponent* Movement = GetCharacterMovement())
+		{
+			Movement->SetMovementMode(MOVE_Walking);
+			Movement->StopMovementImmediately();
+		}
+
+		ExitGhostMode();
+		if(!HasAuthority())
+		{
+			ServerExitGhostMode();
+		}
+			
+		//Reset jump totals
+		JumpTotals = 0;
+
+		ChainsOfRageSlam();
+	}
 }
 
 void ABarbarianCharacter::ChainsOfRageSlam()
