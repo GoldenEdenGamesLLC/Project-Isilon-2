@@ -179,10 +179,10 @@ private:
 	float ChainsOfRageMaxTetherDistance = 200.0f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float ChainsOfRageDuration = 3.0f;
+	float ChainsOfRageDuration = 3.0f; //maybe lower time
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float ChainsOfRageCooldownTime = 3.0f;
+	float ChainsOfRageCooldownTime = 3.0f; //maybe lower time
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
 	float ChainsOfRageTetherGraceDistance = 50.0f;
@@ -204,6 +204,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
 	float ChainsOfRageReactivationRadius = 3000.0f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageSlamAffectedArea = 750.0f;
 
 	void ChainsOfRagePressed();
 
