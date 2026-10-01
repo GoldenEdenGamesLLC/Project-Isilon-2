@@ -170,7 +170,7 @@ private:
 	FVector ChainsOfRageCenter;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float ChainsOfRageThrowDistance = 5000.0f;
+	float ChainsOfRageThrowDistance = 2500.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
 	float ChainsOfRageTetherPullStrength = 5.0f;

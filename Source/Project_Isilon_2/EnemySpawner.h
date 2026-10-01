@@ -82,10 +82,10 @@ private:
 	// ===========================================
 
 	UPROPERTY(EditDefaultsOnly, Category="Object Pooling")
-	int32 InitialMeleePoolSize = 100;
+	int32 InitialMeleePoolSize = 15;
 
 	UPROPERTY(EditDefaultsOnly, Category="Object Pooling")
-	int32 InitialRangedPoolSize = 100;
+	int32 InitialRangedPoolSize = 15;
 
 	UPROPERTY(EditDefaultsOnly, Category="Object Pooling")
 	float RespawnDelay = 3.0f;
