@@ -869,7 +869,7 @@ void ABarbarianCharacter::PostImpactChainsOfRage(const FVector& ImpactPoint)
 	ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
 
 	const bool bFoundEnemies = GetWorld()->OverlapMultiByObjectType(OverlapResults, ImpactPoint, FQuat::Identity, ObjectParams, AxeImpactSphere, QueryParams);
-	
+	 
 	DrawDebugSphere(GetWorld(), ImpactPoint, ChainsOfRageMaxTetherDistance, 32, FColor::Red, false, ChainsOfRageDuration);
 	
 	if(bFoundEnemies)
@@ -970,7 +970,7 @@ void ABarbarianCharacter::UpdateChainsOfRageTethers()
 		}
 	}
 
-	DrawDebugSphere(GetWorld(), ChainsOfRageCenter, ChainsOfRageReactivationRadius, 48, FColor::Orange, false, 2.0f);
+	DrawDebugSphere(GetWorld(), ChainsOfRageCenter, ChainsOfRageReactivationRadius, 16, FColor::Orange, false, 2.0f);
 }
 
 void ABarbarianCharacter::ChainsOfRageReactivation()
