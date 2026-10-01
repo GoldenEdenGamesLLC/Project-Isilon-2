@@ -29,13 +29,13 @@ protected:
 	// ===========================================
 
 	UPROPERTY(EditDefaultsOnly, Category="Stats")
-	float MeleeEnemyBaseHealth = 150.0f;
+	float MeleeEnemyBaseHealth = 120.0f;
 
 	UPROPERTY(ReplicatedUsing = OnRep_MeleeEnemyCurrentHealth, VisibleAnywhere, BlueprintReadOnly, Category="Stats")
-	float MeleeEnemyCurrentHealth = 150.0f;
+	float MeleeEnemyCurrentHealth = 120.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Stats")
-	float BaseDamage = 28.0f;
+	float BaseDamage = 8.0f;
 
 	UPROPERTY(ReplicatedUsing = OnRep_MaxHealth, VisibleAnywhere, BlueprintReadOnly, Category="Stats")
 	float MaxHealth;

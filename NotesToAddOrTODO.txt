@@ -11,12 +11,14 @@ Barbarian
 1. Have Player Take Damage
 2. Continue making stats - Add in leveling system for character to increase stats passively.
 3. Death animation
-4. Interaction
+4. Interaction's
 5. Health Bar
 6. Show Cooldowns
 7. Implement fall damage
-8. Implement Massacre
-9. Implement Spear (Axe)
+8. DONE Implement Massacre
+9. DONE Implement Spear (Axe)
+	9a. When going into the world, drags the head and lags the character.
+	
 
 Enemies
 1. Death Animations
