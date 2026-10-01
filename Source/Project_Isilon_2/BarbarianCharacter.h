@@ -12,6 +12,7 @@ class AInteractableActor;
 class USphereComponent;
 class UInputAction;
 class UUserWidget;
+class ACharacter;
 
 struct FInputActionInstance;
 struct FInputActionValue;
@@ -24,6 +25,22 @@ struct FSphereInteractionParams
 	int32 OtherBodyIndex = INDEX_NONE;
 	bool bFromSweep = false;
 	FHitResult SweepResult;
+};
+
+USTRUCT()
+struct FChainsOfRageKnockbackData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TObjectPtr<ACharacter> Character = nullptr;
+
+	FVector StartLocation = FVector::ZeroVector;
+	FVector TargetLocation = FVector::ZeroVector;
+
+	float ElapsedTime = 0.0f;
+	float Duration = 0.6f;
+	float ArcHeight = 300.0f;
 };
 
 UCLASS()
@@ -160,12 +177,23 @@ private:
 	bool bCanUltimate = true;
 	bool bChainsOfRageActive = false;
 	bool bChainsOfRageReactivationActive = false;
+
+	FVector ChainsOfRageLeapStart = FVector::ZeroVector; 
+	FVector ChainsOfRageLeapTarget = FVector::ZeroVector; 
+
+	float ChainsOfRageLeapElapsedTime = 0.0f;
+
 	FTimerHandle UltimateCooldownTimerHandle;
 	FTimerHandle ChainsOfRageTetherHandle;
 	FTimerHandle ChainsOfRageDurationHandle;
+	FTimerHandle ChainsOfRageKnockbackTimerHandle;
+	FTimerHandle ChainsOfRageLeapTimerHandle;
 
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> ChainsOfRageTargets;
+
+	UPROPERTY()
+	TArray<FChainsOfRageKnockbackData> ChainsOfRageKnockbackEnemies;
 
 	FVector ChainsOfRageCenter;
 
@@ -173,40 +201,61 @@ private:
 	float ChainsOfRageThrowDistance = 2500.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float ChainsOfRageTetherPullStrength = 5.0f;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float ChainsOfRageMaxTetherDistance = 200.0f;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float ChainsOfRageDuration = 3.0f; //maybe lower time
-
-	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
 	float ChainsOfRageCooldownTime = 3.0f; //maybe lower time
 
-	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Tether")
+	float ChainsOfRageTetherPullStrength = 5.0f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Tether")
+	float ChainsOfRageMaxTetherDistance = 200.0f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Tether")
+	float ChainsOfRageDuration = 3.0f; //maybe lower time
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Tether")
 	float ChainsOfRageTetherGraceDistance = 50.0f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Launch")
 	float ChainsOfRageReactivationBaseDamage = 80.0f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Launch")
 	float ChainsOfRageReactivationLaunchSpeed = 1800.0f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Launch")
 	float ChainsOfRageReactivationJumpZVelocity = 800.0f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float ChainsOfRageEnemyLaunchStrength = 1600.0f;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
-	float ChainsOfRageEnemyLaunchZStrength = 450.0f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Launch")
 	float ChainsOfRageReactivationRadius = 3000.0f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Launch")
+	float ChainsOfRageLeapDuration = 1.0f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Launch")
+	float ChainsOfRageLeapArcHeight = 325.0f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Launch")
+	float ChainsOfRageLeapUpdateRate = 0.016f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Knockback")
+	float ChainsOfRageEnemyLaunchStrength = 1600.0f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Knockback")
+	float ChainsOfRageEnemyLaunchZStrength = 450.0f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Knockback")
 	float ChainsOfRageSlamAffectedArea = 750.0f;
+		
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Knockback")
+	float ChainsOfRageKnockbackDistance = 250.0f;	
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Knockback")
+	float ChainsOfRageKnockbackArcHeight = 150.0f;	
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Knockback")
+	float ChainsOfRageKnockbackDuration = 1.5f;	
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Knockback")
+	float ChainsOfRageKnockbackUpdateRate = 0.016f;
 
 	void ChainsOfRagePressed();
 
@@ -222,8 +271,11 @@ private:
 	void UpdateChainsOfRageTethers();
 
 	void ChainsOfRageReactivation();
-	
+	void UpdateChainsOfRageLeap();
 	void ChainsOfRageSlam();
+	
+	void StartChainsOfRageKnockback(ACharacter* EnemyCharacter, const FVector& SlamCenter);
+	void UpdateChainsOfRageKnockback();
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastUltimateThrowFX(FVector Start, FVector End, bool bHit);

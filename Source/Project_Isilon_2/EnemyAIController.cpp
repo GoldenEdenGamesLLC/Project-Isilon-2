@@ -66,6 +66,12 @@ void AEnemyAIController::UpdateChase()
         return;
     }
 
+    if(bCrowdControlActive)
+    {
+        StopMovement();
+        return;
+    }
+
     APawn* ControlledEnemy = GetPawn();
     if(!IsValid(ControlledEnemy)){
         return;
@@ -321,7 +327,7 @@ bool AEnemyAIController::TryJumpObstacle(AEnemyCharacter* Enemy, APawn* Target)
     return false;
 }
 
-//JUMP NAV LINK
+//BEGIN JUMP NAV LINK
 void AEnemyAIController::SetActiveJumpLink(AJumpNavLinkProxy* JumpLink)
 {
     ActiveJumpLink = JumpLink;
@@ -342,3 +348,16 @@ void AEnemyAIController::HandleEnemyLanded(const FHitResult& Hit)
         ActiveJumpLink.Reset();
     }
 }
+//END JUMP NAV LINK
+
+//BEGIN CROWD CONTROL
+void AEnemyAIController::SetCrowdControlActive(bool bActive)
+{
+    bCrowdControlActive = bActive;
+
+    if(bCrowdControlActive)
+    {
+        StopMovement();
+    }
+}
+//END CROWD CONTROL
