@@ -330,9 +330,9 @@ private:
 	// ===========================================
 	
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, EditDefaultsOnly, Category = "Defense")
-	float CurrentHealth = 200.0f;
+	float CurrentHealth = 144.0f;
 	
-	float BaseHealth = 200.0f;
+	float BaseHealth = 144.0f;
 	float MaxHealth = 200.0f;
 	
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
