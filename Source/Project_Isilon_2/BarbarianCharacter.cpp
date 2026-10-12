@@ -547,7 +547,7 @@ void ABarbarianCharacter::InteractWithObject(const FInputActionValue& val)
 
 	if(HasAuthority())
 	{
-		NearbyInteractable->Interact(this);
+		ServerInteract_Implementation(NearbyInteractable);
 	}
 	else
 	{

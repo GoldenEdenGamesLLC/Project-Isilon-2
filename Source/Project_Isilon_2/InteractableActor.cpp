@@ -38,9 +38,9 @@ void AInteractableActor::Tick(float DeltaTime)
 
 }
 
-void AInteractableActor::Interact_Implementation(ABarbarianCharacter* InteractingPlayer)
+void AInteractableActor::Interact_Implementation(ACharacter* InteractingPlayer)
 {
-	if(!HasAuthority())
+	if(!HasAuthority() || !IsValid(InteractingPlayer))
 	{
 		return;
 	}
@@ -48,7 +48,7 @@ void AInteractableActor::Interact_Implementation(ABarbarianCharacter* Interactin
 	UE_LOG(LogTemp, Warning, TEXT("%s interacted with %s"), *GetNameSafe(InteractingPlayer), *GetName());
 }
 
-void AInteractableActor::Interact(ABarbarianCharacter* InteractingPlayer)
+void AInteractableActor::Interact(ACharacter* InteractingPlayer)
 {
 
 }
