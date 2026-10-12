@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "InteractableActor.generated.h"
 
-class ABarbarianCharacter;
+class ACharacter;
 class USphereComponent;
 
 UCLASS()
@@ -30,7 +30,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
-	void Interact(ABarbarianCharacter* InteractingPlayer);
+	void Interact(ACharacter* InteractingPlayer);
 
-	virtual void Interact_Implementation(ABarbarianCharacter* InteractingPlayer);
+	virtual void Interact_Implementation(ACharacter* InteractingPlayer);
 };

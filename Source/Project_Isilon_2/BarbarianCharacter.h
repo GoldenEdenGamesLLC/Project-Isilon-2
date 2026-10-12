@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "InteractionParams.h"
 #include "BarbarianCharacter.generated.h"
 
 class UInputMappingContext;
@@ -16,16 +17,6 @@ class ACharacter;
 
 struct FInputActionInstance;
 struct FInputActionValue;
-
-struct FSphereInteractionParams
-{
-	UPrimitiveComponent* OverlappedComponent = nullptr;
-	AActor* OtherActor = nullptr;
-	UPrimitiveComponent* OtherComp = nullptr;
-	int32 OtherBodyIndex = INDEX_NONE;
-	bool bFromSweep = false;
-	FHitResult SweepResult;
-};
 
 USTRUCT()
 struct FChainsOfRageKnockbackData

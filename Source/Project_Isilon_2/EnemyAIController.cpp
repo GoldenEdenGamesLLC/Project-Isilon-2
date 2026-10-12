@@ -77,6 +77,22 @@ void AEnemyAIController::UpdateChase()
         return;
     }
 
+    // if(currTarget.IsValid())
+    // {
+    //     APawn* ExistingTarget = currTarget.Get();
+
+    //     if(IsValid(ExistingTarget))
+    //     {
+    //         const float DistanceSquared = FVector::DistSquared(ControlledEnemy->GetActorLocation(), ClosestPlayer->GetActorLocation());
+    //         const float LoseDistanceSquared = LoseDistance * LoseDistance;
+
+    //         if(DistanceSquared <= LoseDistanceSquared)
+    //         {
+    //             return;
+    //         }
+    //     }
+    // }
+
     APawn* ClosestPlayer = FindClosestPlayer();
     if(!IsValid(ClosestPlayer)){
         StopChasing();
@@ -159,7 +175,7 @@ void AEnemyAIController::UpdateChase()
 
     if(GetMoveStatus() != EPathFollowingStatus::Moving)
     {
-        MoveToActor(ClosestPlayer, AcceptanceRadius, false, true, true, nullptr, true);
+        MoveToActor(ClosestPlayer, AcceptanceRadius, true, true, true, nullptr, true);
     }
 }
 
@@ -180,6 +196,7 @@ APawn* AEnemyAIController::FindClosestPlayer() const
 
     APawn* ClosestPlayer = nullptr;
     float ClosestDistanceSquared = TNumericLimits<float>::Max();
+    const FVector EnemyLocation = ControlledEnemy->GetActorLocation();
     for(FConstPlayerControllerIterator i = world->GetPlayerControllerIterator(); i; ++i)
     {
         APlayerController* PlayerController = i->Get();
@@ -196,7 +213,7 @@ APawn* AEnemyAIController::FindClosestPlayer() const
             continue;
         }
         
-        const float DistanceSquared = FVector::DistSquared(ControlledEnemy->GetActorLocation(), PlayerPawn->GetActorLocation());
+        const float DistanceSquared = FVector::DistSquared(EnemyLocation, PlayerPawn->GetActorLocation());
 
         //UE_LOG(LogTemp, Warning, TEXT("Player pawn %s found at distance %.2f"), *GetNameSafe(PlayerPawn), Distance);
 

@@ -19,6 +19,8 @@ Barbarian
 9. DONE Implement Spear (Axe)
 	9a. When going into the world, drags the head and lags the character.
 	
+Wizard
+1. DONE Change interaction to be plugged into each character.
 
 Enemies
 1. Death Animations
@@ -43,5 +45,14 @@ World
 
 Business
 1. Change Business Address
-2. Hire Animator and Artist after Demo is finished and things are good
+2. Hire Animator and Artist for Demo
 3. Possibly give percentage of game profits and the $42k
+4. Add Nick to the Business and file now as a multi member LLC
+5. Get Gusto or some payment service
+6. 
+
+Artist to interview
+3. ijustwantallthecats https://www.artstation.com/artwork/X1w9aR
+5. Cypour https://www.behance.net/gallery/240522899/3D-Artworks
+6. HHMHHMHHMHHM https://linktr.ee/EzequielNicanor
+7. Neko-Mellow https://drive.google.com/drive/folders/1QaGe6MdZ_R3u0i8ZWHxGn4wq2aHKErBn?usp=drive_link
