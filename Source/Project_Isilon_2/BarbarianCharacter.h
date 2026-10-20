@@ -29,6 +29,7 @@ struct FChainsOfRageKnockbackData
 	FVector StartLocation = FVector::ZeroVector;
 	FVector TargetLocation = FVector::ZeroVector;
 
+	float StartTime = 0.0f;
 	float ElapsedTime = 0.0f;
 	float Duration = 0.6f;
 	float ArcHeight = 300.0f;
@@ -172,8 +173,6 @@ private:
 	FVector ChainsOfRageLeapStart = FVector::ZeroVector; 
 	FVector ChainsOfRageLeapTarget = FVector::ZeroVector; 
 
-	float ChainsOfRageLeapElapsedTime = 0.0f;
-
 	FTimerHandle UltimateCooldownTimerHandle;
 	FTimerHandle ChainsOfRageTetherHandle;
 	FTimerHandle ChainsOfRageDurationHandle;
@@ -194,6 +193,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
 	float ChainsOfRageCooldownTime = 3.0f; //maybe lower time
 
+	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability")
+	float ChainsOfRageLeapStartTime = 0.0f; //maybe lower time
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Tether")
 	float ChainsOfRageTetherPullStrength = 5.0f;
 	
@@ -219,7 +221,7 @@ private:
 	float ChainsOfRageReactivationRadius = 3000.0f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Launch")
-	float ChainsOfRageLeapDuration = 1.0f;
+	float ChainsOfRageLeapDuration = 0.75f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Launch")
 	float ChainsOfRageLeapArcHeight = 325.0f;
@@ -243,7 +245,7 @@ private:
 	float ChainsOfRageKnockbackArcHeight = 150.0f;	
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Knockback")
-	float ChainsOfRageKnockbackDuration = 1.5f;	
+	float ChainsOfRageKnockbackDuration = 0.8f;	
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Chains of Rage Ability|Knockback")
 	float ChainsOfRageKnockbackUpdateRate = 0.016f;

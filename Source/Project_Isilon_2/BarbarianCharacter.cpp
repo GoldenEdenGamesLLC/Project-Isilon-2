@@ -1004,12 +1004,8 @@ void ABarbarianCharacter::ChainsOfRageReactivation()
 	JumpTotals = 2;
 
 	EnterGhostMode();
-	if(!HasAuthority())
-	{
-		ServerEnterGhostMode();
-	}
 
-	ChainsOfRageLeapElapsedTime = 0.0f;
+	ChainsOfRageLeapStartTime = GetWorld()->GetTimeSeconds();
 
 	if(UCharacterMovementComponent* Movement = GetCharacterMovement())
 	{
@@ -1028,17 +1024,19 @@ void ABarbarianCharacter::UpdateChainsOfRageLeap()
 		return;
 	}
 
-	const float DeltaTime = GetWorld()->GetDeltaSeconds();
-	ChainsOfRageLeapElapsedTime += DeltaTime;
+	const float CurrentTime = GetWorld()->GetTimeSeconds();
+	const float ElapsedTime = CurrentTime - ChainsOfRageLeapStartTime;
 
-	const float Alpha = FMath::Clamp(ChainsOfRageLeapElapsedTime / ChainsOfRageLeapDuration, 0.0f, 1.0f);
+	const float Alpha = FMath::Clamp(ElapsedTime / FMath::Max(ChainsOfRageLeapDuration, KINDA_SMALL_NUMBER), 0.0f, 1.0f);
 	
 	FVector NewLocation = FMath::Lerp(ChainsOfRageLeapStart, ChainsOfRageLeapTarget, Alpha);
 	
 	const float ArcOffset = 4.0f * ChainsOfRageLeapArcHeight * Alpha * (1.0f - Alpha);
 	NewLocation.Z += ArcOffset;
 
-	SetActorLocation(NewLocation, true, nullptr, ETeleportType::None);
+	FHitResult HitResult;
+
+	SetActorLocation(NewLocation, true, &HitResult, ETeleportType::None);
 
 	//end of CoR launch
 	if(Alpha >= 1.0f)
@@ -1051,10 +1049,6 @@ void ABarbarianCharacter::UpdateChainsOfRageLeap()
 		}
 
 		ExitGhostMode();
-		if(!HasAuthority())
-		{
-			ServerExitGhostMode();
-		}
 			
 		//Reset jump totals
 		JumpTotals = 0;
@@ -1085,6 +1079,7 @@ void ABarbarianCharacter::ChainsOfRageSlam()
 
 	if(!bFoundEnemies)
 	{
+		EndChainsOfRage();
 		return;
 	}
 
@@ -1169,7 +1164,7 @@ void ABarbarianCharacter::StartChainsOfRageKnockback(ACharacter* EnemyCharacter,
 	Data.StartLocation = EnemyCharacter->GetActorLocation();
 
 	Data.TargetLocation = Data.StartLocation + (KnockbackDirection * ChainsOfRageKnockbackDistance);
-	Data.ElapsedTime = 0.0f;
+	Data.StartTime = GetWorld()->GetTimeSeconds();
 	Data.Duration = ChainsOfRageKnockbackDuration;
 	Data.ArcHeight = ChainsOfRageKnockbackArcHeight;
 
@@ -1188,7 +1183,7 @@ void ABarbarianCharacter::UpdateChainsOfRageKnockback()
 		return;
 	}
 
-	const float DeltaTime = GetWorld()->GetDeltaSeconds();
+	const float CurrentTime = GetWorld()->GetTimeSeconds();
 
 	for(int32 i = ChainsOfRageKnockbackEnemies.Num() - 1; i >= 0; --i)
 	{
@@ -1200,12 +1195,12 @@ void ABarbarianCharacter::UpdateChainsOfRageKnockback()
 			continue;
 		}
 
-		Data.ElapsedTime += DeltaTime;
+		const float ElapsedTime = CurrentTime - Data.StartTime;
 
 		//Arc for slam knockback for Chains of Rage
 		//Position = Lerp(Start, End, Alpha)
 		//Position.Z += 4 * ArcHeight * Alpha * (1 - Alpha)
-		const float Alpha = FMath::Clamp(Data.ElapsedTime / Data.Duration, 0.0f, 1.0f);
+		const float Alpha = FMath::Clamp(ElapsedTime / FMath::Max(Data.Duration, KINDA_SMALL_NUMBER), 0.0f, 1.0f);
 		FVector NewLocation = FMath::Lerp(Data.StartLocation, Data.TargetLocation, Alpha);
 
 		const float ArcOffset = 4.0f * Data.ArcHeight * Alpha * (1.0f - Alpha);
@@ -1220,8 +1215,8 @@ void ABarbarianCharacter::UpdateChainsOfRageKnockback()
 		{
 			if(UCharacterMovementComponent* Movement = Data.Character->GetCharacterMovement())
 			{
-				Movement->SetMovementMode(MOVE_Walking);
 				Movement->StopMovementImmediately();
+				Movement->SetMovementMode(MOVE_Falling);
 			}
 
 			if(AEnemyAIController* EnemyController = Cast<AEnemyAIController>(Data.Character->GetController()))
