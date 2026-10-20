@@ -37,6 +37,10 @@ AEnemyRangedCharacter::AEnemyRangedCharacter()
 	Movement->MaxAcceleration = 300.f;
 	Movement->BrakingDecelerationFlying = 350.0f;
 
+	Movement->bUseRVOAvoidance = true;
+	Movement->AvoidanceConsiderationRadius = 200.0f; //ring radius
+	Movement->AvoidanceWeight = 0.05f;
+
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Pawn"));
 }

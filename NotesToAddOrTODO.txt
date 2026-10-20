@@ -22,6 +22,9 @@ Barbarian
 Wizard
 1. DONE Change interaction to be plugged into each character.
 
+Ranger
+1. DONE Implement basics - Move, Look, Jump, Interact
+
 Enemies
 1. Death Animations
 2. Stat increases
