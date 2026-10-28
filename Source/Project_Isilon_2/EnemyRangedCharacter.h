@@ -50,17 +50,6 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	// ===========================================
-	// Movement Update
-	// ===========================================
-
-	FTimerHandle RangedMovementTimerHandle;
-
-	UPROPERTY(EditDefaultsOnly, Category="AI")
-	float MovementUpdateInterval = 0.05f;
-
-	void UpdateRangedMovement();
-
-	// ===========================================
 	// Telegraph
 	// ===========================================
 

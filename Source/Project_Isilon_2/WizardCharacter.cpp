@@ -374,3 +374,8 @@ float AWizardCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const
 	return ActualDamage;
 }
 // END DEFENSE
+
+// left click is single chaos elemental damage type
+// TF right click - cone
+//shift is teleport
+//r random meteors

@@ -16,6 +16,8 @@ class PROJECT_ISILON_2_API AEnemyRangedAIController : public AAIController
 {
 	GENERATED_BODY()
 public:
+	AEnemyRangedAIController();
+
 	void PauseForPooling();
 	void ResumeFromPooling();
 
@@ -53,14 +55,23 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
 
+	FTimerHandle RangedMovementTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category="AI")
+	float MovementUpdateInterval = 0.05f;
+
 private:
 	void StartChaseTimer();
-	void UpdateMovement(APawn* Target);
+	void UpdateMovement();
 	void UpdateChase();
 	APawn* FindClosestPlayer() const;
 	void StopChasing();
 
 private:
+	// ===========================================
+	// Movement Update
+	// ===========================================
+
 	bool bIsChasing = false;
 	bool bIsInCastingRange = false;
 
@@ -95,7 +106,7 @@ private:
 	//how often the enemy checks if it should stop chasing
 	//should not be every frame
 	UPROPERTY(EditDefaultsOnly, Category="AI|Flying", meta = (ClampMin = "0.0"))
-	float ChaseCheckInterval = 0.35f;
+	float ChaseCheckInterval = 0.25f;
 
 	UPROPERTY(EditDefaultsOnly, Category="AI|Flying", meta = (ClampMin = "0.0"))
 	float HoverHeight = 200.0f;

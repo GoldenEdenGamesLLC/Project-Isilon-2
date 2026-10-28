@@ -3,11 +3,20 @@
 #include "EnemyRangedAIController.h"
 #include "EnemyRangedCharacter.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/Pawn.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+
+AEnemyRangedAIController::AEnemyRangedAIController()
+{
+    PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bStartWithTickEnabled = true;
+}
 
 void AEnemyRangedAIController::OnPossess(APawn* InPawn)
 {
@@ -32,6 +41,7 @@ void AEnemyRangedAIController::OnPossess(APawn* InPawn)
 void AEnemyRangedAIController::OnUnPossess()
 {
     GetWorldTimerManager().ClearTimer(ChaseTimer);
+    GetWorldTimerManager().ClearTimer(RangedMovementTimerHandle);
     
     if(HasAuthority())
     {
@@ -60,7 +70,6 @@ void AEnemyRangedAIController::UpdateChase()
     const float CurrentTime = GetWorld()->GetTimeSeconds();
     const FVector EnemyLocation = RangedEnemy->GetActorLocation();
 
-    // APawn* ClosestPlayer = FindClosestPlayer();
     APawn* ClosestPlayer = currTarget.Get();
     if(!IsValid(ClosestPlayer))
     {
@@ -145,27 +154,14 @@ void AEnemyRangedAIController::UpdateChase()
 
         }
 
-        UpdateMovement(ClosestPlayer);
+        UpdateMovement();
     }
 }
 
-void AEnemyRangedAIController::UpdateMovement(APawn* Target)
+void AEnemyRangedAIController::UpdateMovement()
 {
+    APawn* Target = currTarget.Get();
     if(!IsValid(Target))
-    {
-        return;
-    }
-    
-    const bool bSameMovementTarget = MovementTarget.Get() == Target;
-    const bool bMoving = GetMoveStatus() == EPathFollowingStatus::Moving;
-
-    if(bSameMovementTarget && bMoving)
-    {
-        return;
-    }
-
-    const float CurrentTime = GetWorld()->GetTimeSeconds();
-    if(CurrentTime < NextPathRequestTime)
     {
         return;
     }
@@ -176,19 +172,50 @@ void AEnemyRangedAIController::UpdateMovement(APawn* Target)
         return;
     }
 
-    const float DesiredAcceptanceRadius = FMath::Max(AcceptanceRadius, RangedEnemy->GetCastEnterDistance() * 0.85f);
-    const EPathFollowingRequestResult::Type Result = MoveToActor(Target, DesiredAcceptanceRadius, false, true, true, nullptr, false);
+	UCharacterMovementComponent* Movement = RangedEnemy->GetCharacterMovement();
+	if(this->IsInCastingRange())
+	{
+		//set focus in control and allows strafe
+		RangedEnemy->bUseControllerRotationYaw = true;
+		Movement->bOrientRotationToMovement = false;
+	}
+	else{
+		RangedEnemy->bUseControllerRotationYaw = false;
+		Movement->bOrientRotationToMovement = true;
+	}
 
-    NextPathRequestTime = CurrentTime + PathRetryInterval;
+	FVector PlayerLocation = Target->GetActorLocation();
+	const FVector BaseRingOffset(this->GetRingRadius(), 0.0f, 0.0f);
+	const FVector RingOffset = BaseRingOffset.RotateAngleAxis(this->GetRingAngleDegrees(), FVector::UpVector);
 
-    if(Result != EPathFollowingRequestResult::Failed)
-    {
-        MovementTarget = Target;
-    }
-    else
-    {
-        MovementTarget.Reset();
-    }
+	FVector DesiredLocation = PlayerLocation + RingOffset;
+	DesiredLocation.Z += this->GetHoverHeight();
+
+	const FVector ToTarget = DesiredLocation - RangedEnemy->GetActorLocation();
+	const float Distance = ToTarget.Size();
+
+	if(Distance <= this->GetAcceptanceRadius())
+	{
+		Movement->Velocity = FVector::ZeroVector;
+		return;
+	}
+
+	//change direction
+	const FVector Direction = ToTarget.GetSafeNormal();
+	Movement->Velocity = Direction * Movement->MaxFlySpeed;
+
+	FVector StartLocation = RangedEnemy->GetActorLocation();
+
+	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation, PlayerLocation);
+
+	TargetRotation.Pitch = 0.0f;
+	TargetRotation.Roll = 0.0f;
+
+	float DeltaTime = UGameplayStatics::GetWorldDeltaSeconds(this);
+	FRotator CurrentRotation = RangedEnemy->GetActorRotation();
+	FRotator NewRot = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, 5.0f);
+
+	RangedEnemy->SetActorRotation(NewRot);
 }
 
 APawn* AEnemyRangedAIController::FindClosestPlayer() const
@@ -246,6 +273,7 @@ APawn* AEnemyRangedAIController::FindClosestPlayer() const
 void AEnemyRangedAIController::StartChaseTimer()
 {
     GetWorldTimerManager().ClearTimer(ChaseTimer);
+    GetWorldTimerManager().ClearTimer(RangedMovementTimerHandle);
 
     if(!HasAuthority() || !GetPawn() || bPausedForPooling)
     {
@@ -253,10 +281,10 @@ void AEnemyRangedAIController::StartChaseTimer()
     }
 
     const float Interval = FMath::Max(0.05f, ChaseCheckInterval);
-
     const float InitialDelay = FMath::FRandRange(0.01f, ChaseCheckInterval);
 
     GetWorldTimerManager().SetTimer(ChaseTimer, this, &AEnemyRangedAIController::UpdateChase, Interval, true, InitialDelay);
+    GetWorldTimerManager().SetTimer(RangedMovementTimerHandle, this, &AEnemyRangedAIController::UpdateMovement, MovementUpdateInterval, true, InitialDelay);
 }
 
 void AEnemyRangedAIController::StopChasing()
@@ -289,6 +317,7 @@ void AEnemyRangedAIController::PauseForPooling()
     bPausedForPooling = true;
 
     GetWorldTimerManager().ClearTimer(ChaseTimer);
+    GetWorldTimerManager().ClearTimer(RangedMovementTimerHandle);
 
     StopChasing();
 

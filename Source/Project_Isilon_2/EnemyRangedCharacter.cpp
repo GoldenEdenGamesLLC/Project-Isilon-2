@@ -8,7 +8,6 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "EnemyRangedAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -30,6 +29,9 @@ AEnemyRangedCharacter::AEnemyRangedCharacter()
 	bUseControllerRotationRoll = false;
 
 	UCharacterMovementComponent* Movement = GetCharacterMovement();
+
+	Movement->SetMovementMode(MOVE_Flying);
+
 	Movement->bOrientRotationToMovement = true;
 	Movement->RotationRate = FRotator(0.0f, 400.0f, 0.0f);
 	Movement->GravityScale = 0.0f;
@@ -49,8 +51,6 @@ AEnemyRangedCharacter::AEnemyRangedCharacter()
 void AEnemyRangedCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 }
 
 // Called every frame
@@ -87,71 +87,6 @@ FVector AEnemyRangedCharacter::GetEnemyTargetLocation_Implementation()
 	return GetActorLocation();
 }
 //END ENEMY INTERFACING
-
-void AEnemyRangedCharacter::UpdateRangedMovement()
-{
-	if(!HasAuthority())
-	{
-		return;
-	}
-
-	AEnemyRangedAIController* RangedController = Cast<AEnemyRangedAIController>(GetController());
-	if(!IsValid(RangedController))
-	{
-		return;
-	}
-
-	APawn* Target = RangedController->GetCurrentTarget();
-	if(!IsValid(Target))
-	{
-		return;
-	}
-
-	UCharacterMovementComponent* Movement = GetCharacterMovement();
-	if(RangedController->IsInCastingRange())
-	{
-		//set focus in control and allows strafe
-		bUseControllerRotationYaw = true;
-		Movement->bOrientRotationToMovement = false;
-	}
-	else{
-		bUseControllerRotationYaw = false;
-		Movement->bOrientRotationToMovement = true;
-	}
-
-	FVector PlayerLocation = Target->GetActorLocation();
-	const FVector BaseRingOffset(RangedController->GetRingRadius(), 0.0f, 0.0f);
-	const FVector RingOffset = BaseRingOffset.RotateAngleAxis(RangedController->GetRingAngleDegrees(), FVector::UpVector);
-
-	FVector DesiredLocation = PlayerLocation + RingOffset;
-	DesiredLocation.Z += RangedController->GetHoverHeight();
-
-	const FVector ToTarget = DesiredLocation - GetActorLocation();
-	const float Distance = ToTarget.Size();
-
-	if(Distance <= RangedController->GetAcceptanceRadius())
-	{
-		Movement->Velocity = FVector::ZeroVector;
-		return;
-	}
-
-	//change direction
-	const FVector Direction = ToTarget.GetSafeNormal();
-	Movement->Velocity = Direction * Movement->MaxFlySpeed;
-
-	FVector StartLocation = GetActorLocation();
-
-	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation, PlayerLocation);
-
-	TargetRotation.Pitch = 0.0f;
-	TargetRotation.Roll = 0.0f;
-
-	float DeltaTime = UGameplayStatics::GetWorldDeltaSeconds(this);
-	FRotator CurrentRotation = GetActorRotation();
-	FRotator NewRot = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, 5.0f);
-
-	SetActorRotation(NewRot);
-}
 
 //Start Damage Taking Section
 float AEnemyRangedCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -265,9 +200,6 @@ void AEnemyRangedCharacter::ActivateFromPool(const FVector& SpawnLocation, const
 		UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s has no valid controller to resume from pooling."), *GetNameSafe(this));
 	}
 	
-	GetWorldTimerManager().ClearTimer(RangedMovementTimerHandle);
-	GetWorldTimerManager().SetTimer(RangedMovementTimerHandle, this, &AEnemyRangedCharacter::UpdateRangedMovement, MovementUpdateInterval, true);
-
 	ForceNetUpdate();
 }
 
@@ -281,7 +213,6 @@ void AEnemyRangedCharacter::DeactivateForPool()
 	bPoolActive = false;
 
 	ResetBasicCast();
-	GetWorldTimerManager().ClearTimer(RangedMovementTimerHandle);
 
 	GetCharacterMovement()->StopMovementImmediately();
 
