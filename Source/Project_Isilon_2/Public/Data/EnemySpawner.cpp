@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "EnemySpawner.h"
-#include "EnemyCharacter.h"
-#include "EnemyRangedCharacter.h"
+#include "Data/EnemySpawner.h"
+#include "Enemies/EnemyCharacter.h"
+#include "Enemies/EnemyRangedCharacter.h"
 
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/BillboardComponent.h"

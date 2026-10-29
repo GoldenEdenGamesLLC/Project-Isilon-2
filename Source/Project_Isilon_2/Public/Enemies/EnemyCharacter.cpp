@@ -3,8 +3,8 @@
 
 #include "EnemyCharacter.h"
 
-#include "EnemySpawner.h"
-#include "EnemyAIStats.h"
+#include "Data/EnemySpawner.h"
+#include "Data/EnemyAIStats.h"
 #include "EnemyAIController.h"
 
 #include "GameFramework/CharacterMovementComponent.h"

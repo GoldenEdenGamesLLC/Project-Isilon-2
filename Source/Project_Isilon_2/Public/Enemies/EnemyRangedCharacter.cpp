@@ -3,8 +3,8 @@
 
 #include "EnemyRangedCharacter.h"
 #include "EnemyRangedAIController.h"
-#include "EnemySpawner.h"
-#include "EnemyAIStats.h"
+#include "Data/EnemySpawner.h"
+#include "Data/EnemyAIStats.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
