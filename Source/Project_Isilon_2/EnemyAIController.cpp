@@ -33,12 +33,6 @@ void AEnemyAIController::OnPossess(APawn* InPawn){
     bIsChasing = false;
     currTarget.Reset();
 
-    StuckTimer = 0.0f;
-    bHasLastPosition = false;
-    LastPosition = FVector::ZeroVector;
-
-    UpdateChase();
-
     GetWorldTimerManager().SetTimer(ChaseTimer, this, &AEnemyAIController::UpdateChase, ChaseCheckInterval, true);
 }
 
@@ -77,22 +71,6 @@ void AEnemyAIController::UpdateChase()
         return;
     }
 
-    // if(currTarget.IsValid())
-    // {
-    //     APawn* ExistingTarget = currTarget.Get();
-
-    //     if(IsValid(ExistingTarget))
-    //     {
-    //         const float DistanceSquared = FVector::DistSquared(ControlledEnemy->GetActorLocation(), ClosestPlayer->GetActorLocation());
-    //         const float LoseDistanceSquared = LoseDistance * LoseDistance;
-
-    //         if(DistanceSquared <= LoseDistanceSquared)
-    //         {
-    //             return;
-    //         }
-    //     }
-    // }
-
     APawn* ClosestPlayer = FindClosestPlayer();
     if(!IsValid(ClosestPlayer)){
         StopChasing();
@@ -128,42 +106,6 @@ void AEnemyAIController::UpdateChase()
 
         return;
     }
-
-    //check jump
-    const FVector CurrentPosition = Enemy->GetActorLocation();
-
-    if(!bHasLastPosition)
-    {
-        LastPosition = CurrentPosition;
-        bHasLastPosition = true;
-    }
-    else
-    {
-        const float DistanceMoved = FVector::Dist2D(CurrentPosition, LastPosition);
-
-        if(bAlreadyChasingThisPlayer /*&& DistanceMoved < MovementThreshold*/)
-        {
-            StuckTimer += ChaseCheckInterval;
-        }
-        else
-        {
-            StuckTimer = 0.0f;
-        }
-
-        LastPosition = CurrentPosition;
-    }
-
-    // if(StuckTimer >= StuckThresholdTime)
-    // {
-    //     if(TryJumpObstacle(Enemy, ClosestPlayer))
-    //     {
-    //         StuckTimer = 0.0f;
-    //         return;
-    //     }
-
-    //     StuckTimer = 0.0f;
-    //     return;
-    // }
 
     if(!bAlreadyChasingThisPlayer)
     {
@@ -234,9 +176,6 @@ void AEnemyAIController::StopChasing()
 
     currTarget.Reset();
     bIsChasing = false;
-
-    StuckTimer = 0.0f;
-    bHasLastPosition = false;
 }
 
 void AEnemyAIController::PauseForPooling()
@@ -264,84 +203,14 @@ void AEnemyAIController::ResumeFromPooling()
 		return;
 	}
 
+    GetWorldTimerManager().ClearTimer(ChaseTimer);
+
     bPausedForPooling = false;
 
     currTarget.Reset();
     bIsChasing = false;
 
-    StuckTimer = 0.0f;
-    bHasLastPosition = false;
-    LastPosition = FVector::ZeroVector;
-
-    GetWorldTimerManager().ClearTimer(ChaseTimer);
-
-    UpdateChase();
-
     GetWorldTimerManager().SetTimer(ChaseTimer, this, &AEnemyAIController::UpdateChase, ChaseCheckInterval, true);
-}
-
-bool AEnemyAIController::TryJumpObstacle(AEnemyCharacter* Enemy, APawn* Target)
-{
-    if(!IsValid(Enemy) || !IsValid(Target))
-    {
-        return false;
-    }
-
-    UCharacterMovementComponent* Movement = Enemy->GetCharacterMovement();
-
-    if(!Movement || !Movement->IsMovingOnGround())
-    {
-        return false;
-    }
-
-    FVector JumpDirection = Target->GetActorLocation() - Enemy->GetActorLocation();
-    JumpDirection.Z = 0.0f;
-
-    if(!JumpDirection.Normalize())
-    {
-        return false;
-    }
-
-    UCapsuleComponent* Capsule = Enemy->GetCapsuleComponent();
-    if(!Capsule)
-    {
-        return false;
-    }
-
-    const float CapsuleHalfHeight = Capsule->GetScaledCapsuleHalfHeight();
-    const float CapsuleRadius = Capsule->GetScaledCapsuleRadius();
-
-    FVector LowStart = Enemy->GetActorLocation() - FVector(0.0f, 0.0f, CapsuleHalfHeight - 30.0f);
-    LowStart += JumpDirection * (CapsuleRadius + 5.0f);
-
-    const FVector LowEnd = LowStart + JumpDirection * ObstacleCheckDistance;
-
-    FVector HighStart = Enemy->GetActorLocation() + FVector(0.0f, 0.0f, 40.0f);
-    HighStart += JumpDirection * (CapsuleRadius + 5.0f);
-
-    const FVector HighEnd = HighStart + JumpDirection * ObstacleCheckDistance;
-    
-    FCollisionQueryParams QueryParams;
-    
-    QueryParams.AddIgnoredActor(Enemy);
-    QueryParams.AddIgnoredActor(Target);
-
-    FHitResult LowHit;
-    FHitResult HighHit;
-
-    const bool bLowBlocked = GetWorld()->LineTraceSingleByChannel(LowHit, LowStart, LowEnd, ECC_Visibility, QueryParams);
-    const bool bHighBlocked = GetWorld()->LineTraceSingleByChannel(HighHit, HighStart, HighEnd, ECC_Visibility, QueryParams);
-
-    if(bLowBlocked && !bHighBlocked)
-    {
-        StopMovement();
-        const FVector LaunchVelocity = (JumpDirection * JumpForwardStrength) + FVector(0.0f, 0.0f, JumpZStrength);
-
-        Enemy->LaunchCharacter(LaunchVelocity, true, true);
-        return true;
-    }
-
-    return false;
 }
 
 //BEGIN JUMP NAV LINK

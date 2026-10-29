@@ -117,6 +117,7 @@ void AWizardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &AWizardCharacter::JumpPressed);
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &AWizardCharacter::StopJumping);
 		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &AWizardCharacter::InteractWithObject);
+		EnhancedInputComponent->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &AWizardCharacter::BasicAttackPressed);
 	}
 }
 
@@ -376,6 +377,126 @@ float AWizardCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const
 // END DEFENSE
 
 // left click is single chaos elemental damage type
+// Basic Attack Start
+void AWizardCharacter::BasicAttackPressed()
+{
+	if(!bCanBasicAttack)
+	{
+		return;
+	}
+
+	const FRotator AimRotation = followCamera->GetComponentRotation();
+
+	FRotator AttackRotation(0.0f, AimRotation.Yaw, 0.0f);
+	SetActorRotation(AttackRotation);
+
+	if(HasAuthority())
+	{
+		PerformBasicAttack(AimRotation);
+		return;
+	}
+
+	bCanBasicAttack = false;
+
+	GetWorldTimerManager().SetTimer(BasicAttackCooldownTimerHandle, this, &AWizardCharacter::BasicAttackCompleted, BasicAttackSpeed, false);
+
+	ServerBasicAttack(AimRotation);
+}
+
+void AWizardCharacter::ServerBasicAttack_Implementation(FRotator AimRotation)
+{
+	if(!bCanBasicAttack)
+	{
+		return;
+	}
+
+	PerformBasicAttack(AimRotation);
+}
+
+void AWizardCharacter::PerformBasicAttack(FRotator AimRotation)
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	if(!bCanBasicAttack)
+	{
+		return;
+	}
+
+	bCanBasicAttack = false;
+
+	const FVector AttackDirection = AimRotation.Vector().GetSafeNormal();
+	const FRotator CharacterRotation(0.0f, AimRotation.Yaw, 0.0f);
+
+	SetActorRotation(CharacterRotation);
+
+	FVector Start = GetActorLocation();
+	FVector AttackStart = Start + (AttackDirection * BasicAttackStartDistance);
+	FVector End = Start + (AttackDirection * BasicAttackEndDistance);
+
+	TArray<FHitResult> HitResults;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	FCollisionShape AttackSweep = FCollisionShape::MakeCapsule(BasicAttackRadius, BasicAttackHalfHeight);
+
+	bool bHit = GetWorld()->SweepMultiByChannel(HitResults, AttackStart, End, FQuat::Identity, ECC_Pawn, AttackSweep, QueryParams);
+
+	TSet<AActor*> damagedActors;
+	if(bHit)
+	{
+		for(auto& Hit : HitResults)
+		{
+			AActor* HitActor = Hit.GetActor();
+			if(HitActor)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[SERVER] Basic Attack Hit: %s"), *HitActor->GetName());
+				damagedActors.Add(HitActor);
+
+				UGameplayStatics::ApplyDamage(HitActor, BasicAttackDamage /*Change to be the wizard spell calc*/, GetController(), this, UDamageType::StaticClass() /*Change to be the type of damage hitting the enemies*/);
+			}
+		}
+	}
+
+	uint8 ElementalDamageType = 0;
+
+	MulticastBasicAttackFX(AttackStart, End, bHit, ElementalDamageType);
+
+	GetWorldTimerManager().SetTimer(BasicAttackCooldownTimerHandle, this, &AWizardCharacter::BasicAttackCompleted, BasicAttackSpeed, false);
+}
+
+void AWizardCharacter::MulticastBasicAttackFX_Implementation(FVector Start, FVector End, bool bHit, uint8 ElementalDamageType)
+{
+	switch(ElementalDamageType)
+	{
+		case 1:
+		//lightning light blue
+		case 2:
+		//fire red orange
+		case 3:
+		//grass green
+		case 4:
+		//ice darker blue
+		default:
+			break;
+	}
+
+	DrawDebugCapsule(GetWorld(), Start, BasicAttackHalfHeight, BasicAttackRadius, FQuat::Identity, FColor::Yellow, false, 1.0f);
+
+	DrawDebugCapsule(GetWorld(), End, BasicAttackHalfHeight, BasicAttackRadius, FQuat::Identity, bHit ? FColor::Red : FColor::Green, false, 1.0f);
+}
+
+//resets basic attack cd
+void AWizardCharacter::BasicAttackCompleted()
+{
+	bCanBasicAttack = true;
+}
+
+// Basic Attack End
+
+
 // TF right click - cone
 //shift is teleport
 //r random meteors

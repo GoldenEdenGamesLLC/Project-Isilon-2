@@ -49,6 +49,7 @@ private:
 	// ===========================================
 	// Jump
 	// ===========================================
+
 	int32 JumpTotals = 0;
 	bool bCanJumpCooldown = true;
 	FTimerHandle JumpCooldownTimerHandle;
@@ -59,6 +60,41 @@ private:
 	void JumpPressed();
 	void ResetJumpCooldown();
 
+	// ===========================================
+	// Wizard Chaos Bolt
+	// ===========================================
+	
+	bool bCanBasicAttack = true;
+	FTimerHandle BasicAttackCooldownTimerHandle;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
+	float BasicAttackSpeed = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
+	float BasicAttackDamage = 125.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
+	float BasicAttackHalfHeight = 50.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
+	float BasicAttackRadius = 80.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
+	float BasicAttackStartDistance = 40.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
+	float BasicAttackEndDistance = 500.0f;
+
+	void BasicAttackPressed();
+	void PerformBasicAttack(FRotator AimRotation);
+
+	UFUNCTION(Server, Reliable)
+	void ServerBasicAttack(FRotator AimRotation);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastBasicAttackFX(FVector Start, FVector End, bool bHit, uint8 ElementalDamageType);
+
+	void BasicAttackCompleted();
 		
 	// ===========================================
 	// Stats

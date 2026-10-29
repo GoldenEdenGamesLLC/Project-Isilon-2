@@ -160,7 +160,6 @@ private:
 	void MulticastBasicAttackFX(FVector Start, FVector End, bool bHit);
 
 	void BasicAttackCompleted();
-	void ResetBasicAttackCooldown();
 
 	// ===========================================
 	// Chains of Rage - Ultimate - Barbarian

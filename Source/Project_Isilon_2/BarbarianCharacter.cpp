@@ -454,12 +454,8 @@ void ABarbarianCharacter::BasicAttackPressed()
 	ServerBasicAttack(AimRotation);
 }
 
+//resets basic attack cd
 void ABarbarianCharacter::BasicAttackCompleted()
-{
-	ResetBasicAttackCooldown();
-}
-
-void ABarbarianCharacter::ResetBasicAttackCooldown()
 {
 	bCanBasicAttack = true;
 }
