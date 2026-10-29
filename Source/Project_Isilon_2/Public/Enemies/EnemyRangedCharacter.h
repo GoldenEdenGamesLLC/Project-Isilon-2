@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EnemyInterface.h"
+#include "Interfaces/EnemyInterface.h"
 #include "GameFramework/Character.h"
 #include "EnemyRangedCharacter.generated.h"
 

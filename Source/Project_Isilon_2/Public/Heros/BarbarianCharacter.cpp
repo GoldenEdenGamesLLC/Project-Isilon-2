@@ -27,8 +27,8 @@
 #include "Blueprint/UserWidget.h"
 #include "DrawDebugHelpers.h"
 
-#include "EnemyAIController.h"
-#include "EnemyInterface.h"
+#include "Enemies/EnemyAIController.h"
+#include "Interfaces/EnemyInterface.h"
 
 //ignores players and focuses on enemies when dashing
 #define ECC_Enemy ECC_GameTraceChannel1
