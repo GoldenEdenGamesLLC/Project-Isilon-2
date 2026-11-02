@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CharacterSelectionGameMode.h"
-#include "CharSelectionPlayerController.h"
+#include "Game/CharacterSelectionGameMode.h"
+#include "Game/CharSelectionPlayerController.h"
 
 ACharacterSelectionGameMode::ACharacterSelectionGameMode()
 {

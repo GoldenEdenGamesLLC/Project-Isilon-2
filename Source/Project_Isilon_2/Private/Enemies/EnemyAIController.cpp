@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "EnemyAIController.h"
-#include "EnemyCharacter.h"
-#include "JumpNavLinkProxy.h"
+#include "Enemies/EnemyAIController.h"
+#include "Enemies/EnemyCharacter.h"
+#include "Enemies/JumpNavLinkProxy.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Navigation/PathFollowingComponent.h"

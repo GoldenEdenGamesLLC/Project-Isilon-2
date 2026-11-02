@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "InteractableActor.h"
+#include "Heros/InteractableActor.h"
 
 #include "Components/SphereComponent.h"
-#include "BarbarianCharacter.h"
+#include "Heros/BarbarianCharacter.h"
 
 // Sets default values
 AInteractableActor::AInteractableActor()
