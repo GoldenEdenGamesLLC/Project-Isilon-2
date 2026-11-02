@@ -1,14 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "EnemyRangedCharacter.h"
-#include "EnemyRangedAIController.h"
+#include "Enemies/EnemyRangedCharacter.h"
+#include "Enemies/EnemyRangedAIController.h"
 #include "Data/EnemySpawner.h"
 #include "Data/EnemyAIStats.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "EnemyRangedAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 

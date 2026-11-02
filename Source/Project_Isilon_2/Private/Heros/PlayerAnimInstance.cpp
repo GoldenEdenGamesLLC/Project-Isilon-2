@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PlayerAnimInstance.h"
+#include "Heros/PlayerAnimInstance.h"
 
-#include "BarbarianCharacter.h"
+#include "Heros/BarbarianCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 UPlayerAnimInstance::UPlayerAnimInstance()

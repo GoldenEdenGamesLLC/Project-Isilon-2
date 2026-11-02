@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CharSelectionPlayerController.h"
-#include "CharacterSelectionGameMode.h"
+#include "Game/CharSelectionPlayerController.h"
+#include "Game/CharacterSelectionGameMode.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"

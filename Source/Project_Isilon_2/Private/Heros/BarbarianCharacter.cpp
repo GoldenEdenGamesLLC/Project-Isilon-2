@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BarbarianCharacter.h"
+#include "Heros/BarbarianCharacter.h"
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Camera/CameraComponent.h"
-#include "InteractableActor.h"
+#include "Heros/InteractableActor.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"

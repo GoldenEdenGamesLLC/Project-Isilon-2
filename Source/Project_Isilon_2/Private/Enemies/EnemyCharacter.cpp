@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "EnemyCharacter.h"
+#include "Enemies/EnemyCharacter.h"
 
 #include "Data/EnemySpawner.h"
 #include "Data/EnemyAIStats.h"
-#include "EnemyAIController.h"
+#include "Enemies/EnemyAIController.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -73,6 +73,8 @@ FVector AEnemyCharacter::GetEnemyTargetLocation_Implementation()
 //END ENEMY INTERFACING
 
 //Start Damage Taking Section
+//TODO::
+//1. BRING THIS TO GAMEPLAYABILITYSYSTEMLIBRARY
 float AEnemyCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if(!HasAuthority())

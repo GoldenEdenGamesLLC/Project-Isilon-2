@@ -1,7 +1,7 @@
 //Fill out your copyright notice in the Description page of Project Settings.
 
-#include "EnemyRangedAIController.h"
-#include "EnemyRangedCharacter.h"
+#include "Enemies/EnemyRangedAIController.h"
+#include "Enemies/EnemyRangedCharacter.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Navigation/PathFollowingComponent.h"
