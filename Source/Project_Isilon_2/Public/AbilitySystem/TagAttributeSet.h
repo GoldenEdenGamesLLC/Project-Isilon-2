@@ -42,16 +42,7 @@ public:
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(UTagAttributeSet, MaxHealth)
 
-	// Generic resource: Rage for the Barbarian, Focus for the Ranger, Mana for the Wizard
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Resource, Category = "Vitals")
-	FGameplayAttributeData Resource;
-	ATTRIBUTE_ACCESSORS(UTagAttributeSet, Resource)
-
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxResource, Category = "Vitals")
-	FGameplayAttributeData MaxResource;
-	ATTRIBUTE_ACCESSORS(UTagAttributeSet, MaxResource)
-
-	// ===========================================
+	//==========================================
 	// Offense
 	// ===========================================
 	// Scales Physical damage
@@ -111,12 +102,6 @@ protected:
 	void OnRep_MaxHealth(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
-	void OnRep_Resource(const FGameplayAttributeData& OldValue);
-
-	UFUNCTION()
-	void OnRep_MaxResource(const FGameplayAttributeData& OldValue);
-
-	UFUNCTION()
 	void OnRep_AttackPower(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
@@ -139,4 +124,5 @@ protected:
 
 	UFUNCTION()
 	void OnRep_PoisonResistance(const FGameplayAttributeData& OldValue);
+	
 };

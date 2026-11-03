@@ -11,8 +11,6 @@ UTagAttributeSet::UTagAttributeSet()
 	// Safe defaults; real values come from each hero's init attributes effect
 	InitHealth(100.0f);
 	InitMaxHealth(100.0f);
-	InitResource(100.0f);
-	InitMaxResource(100.0f);
 	InitAttackPower(0.0f);
 	InitSpellPower(0.0f);
 	InitCritChance(0.0f);
@@ -30,8 +28,6 @@ void UTagAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, Resource, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, MaxResource, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, AttackPower, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, SpellPower, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, CritChance, COND_None, REPNOTIFY_Always);
@@ -51,11 +47,7 @@ void UTagAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, f
 	{
 		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHealth());
 	}
-	else if(Attribute == GetResourceAttribute())
-	{
-		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxResource());
-	}
-	else if(Attribute == GetMaxHealthAttribute() || Attribute == GetMaxResourceAttribute())
+	else if(Attribute == GetMaxHealthAttribute())
 	{
 		NewValue = FMath::Max(NewValue, 1.0f);
 	}
@@ -93,10 +85,6 @@ void UTagAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
 	}
-	else if(Data.EvaluatedData.Attribute == GetResourceAttribute())
-	{
-		SetResource(FMath::Clamp(GetResource(), 0.0f, GetMaxResource()));
-	}
 }
 
 void UTagAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue)
@@ -107,16 +95,6 @@ void UTagAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue)
 void UTagAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UTagAttributeSet, MaxHealth, OldValue);
-}
-
-void UTagAttributeSet::OnRep_Resource(const FGameplayAttributeData& OldValue)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UTagAttributeSet, Resource, OldValue);
-}
-
-void UTagAttributeSet::OnRep_MaxResource(const FGameplayAttributeData& OldValue)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UTagAttributeSet, MaxResource, OldValue);
 }
 
 void UTagAttributeSet::OnRep_AttackPower(const FGameplayAttributeData& OldValue)
