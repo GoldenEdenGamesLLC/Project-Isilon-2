@@ -25,4 +25,13 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	static FGameplayTagContainer GetDamageTypeTags();
+
+	/**
+	 * Server only. Applies a damage effect from the attacker's ASC to the target's ASC.
+	 * DamageByType maps a damage type tag (Combat.DamageType.*) to its base amount.
+	 * Attacker ASC is looked up from DamageCauser, then from Instigator's pawn.
+	 * DamageEffectClass defaults to UGE_Damage.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Combat", meta = (AutoCreateRefTerm = "DamageByType"))
+	static bool ApplyGASDamage(AActor* Target, AActor* DamageCauser, AController* Instigator, const TMap<FGameplayTag, float>& DamageByType, TSubclassOf<UGameplayEffect> DamageEffectClass = nullptr);
 };

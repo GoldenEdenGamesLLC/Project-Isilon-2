@@ -3,10 +3,12 @@
 
 #include "Game/CharacterSelectionGameMode.h"
 #include "Game/CharSelectionPlayerController.h"
+#include "Game/HeroPlayerState.h"
 
 ACharacterSelectionGameMode::ACharacterSelectionGameMode()
 {
     PlayerControllerClass = ACharSelectionPlayerController::StaticClass();
+    PlayerStateClass = AHeroPlayerState::StaticClass();
 
     DefaultPawnClass = nullptr;
 }

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Interfaces/EnemyInterface.h"
-#include "GameFramework/Character.h"
+#include "Enemies/EnemyCharacterBase.h"
 #include "EnemyCharacter.generated.h"
 
 
@@ -12,7 +12,7 @@ class AEnemySpawner;
 class UEnemyAIStats;
 
 UCLASS()
-class PROJECT_ISILON_2_API AEnemyCharacter : public ACharacter, public IEnemyInterface
+class PROJECT_ISILON_2_API AEnemyCharacter : public AEnemyCharacterBase, public IEnemyInterface
 {
 	GENERATED_BODY()
 
@@ -42,6 +42,8 @@ protected:
 	float Damage;
 
 	void ApplyDifficulty(const UEnemyAIStats* DifficultyStats, float RuntimeCoefficient);
+
+	virtual void HandleHealthChanged(float OldHealth, float NewHealth) override;
 
 	UFUNCTION()
 	void OnRep_MeleeEnemyCurrentHealth();

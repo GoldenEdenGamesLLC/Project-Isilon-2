@@ -6,6 +6,8 @@
 #include "Data/EnemySpawner.h"
 #include "Data/EnemyAIStats.h"
 #include "Enemies/EnemyAIController.h"
+#include "Libraries/GameplayAbilitySystemLibrary.h"
+#include "Data/GameplayTags.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -88,20 +90,27 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const&
 	}
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	MeleeEnemyCurrentHealth = FMath::Clamp(MeleeEnemyCurrentHealth - ActualDamage, 0.0f, MaxHealth);
-	//UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), ActualDamage, MeleeEnemyCurrentHealth);
 
-	if(MeleeEnemyCurrentHealth <= 0.0f)
+	// Health now lives in GAS; HandleHealthChanged mirrors it back and handles death
+	TMap<FGameplayTag, float> DamageByType;
+	DamageByType.Add(GameplayTags::Combat::DamageTypes::Physical, ActualDamage);
+	UGameplayAbilitySystemLibrary::ApplyGASDamage(this, DamageCauser, EventInstigator, DamageByType);
+
+	return ActualDamage;
+}
+
+void AEnemyCharacter::HandleHealthChanged(float OldHealth, float NewHealth)
+{
+	MeleeEnemyCurrentHealth = NewHealth;
+	//UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), OldHealth - NewHealth, MeleeEnemyCurrentHealth);
+
+	if(bPoolActive && OldHealth > 0.0f && NewHealth <= 0.0f)
 	{
 		if(IsValid(OwningSpawner.Get()))
 		{
-			MeleeEnemyCurrentHealth = 0.0f;
-			
 			OwningSpawner.Get()->ReturnMeleeEnemyToPool(this);
 		}
 	}
-	
-	return ActualDamage;
 }
 
 void AEnemyCharacter::OnRep_MeleeEnemyCurrentHealth()
@@ -219,6 +228,7 @@ void AEnemyCharacter::ApplyDifficulty(const UEnemyAIStats* DifficultyStats, floa
 		MaxHealth = MeleeEnemyBaseHealth;
 		MeleeEnemyCurrentHealth = MaxHealth;
 		Damage = BaseDamage;
+		InitHealthAttributes(MaxHealth);
 
 		return;
 	}
@@ -241,6 +251,7 @@ void AEnemyCharacter::ApplyDifficulty(const UEnemyAIStats* DifficultyStats, floa
 	MaxHealth = MeleeEnemyBaseHealth * currentHealthCoefficient;
 	MeleeEnemyCurrentHealth = MaxHealth;
 	Damage = BaseDamage * currentDamageCoefficient;
+	InitHealthAttributes(MaxHealth);
 
 	// UE_LOG(LogTemp, Warning, TEXT("[DIFFICULTY] %s | RuntimeCoefficient: %.3f | HealthScale: %.3f | DamageScale: %.3f"),*GetName(), RuntimeCoefficient, HealthScaling, DamageScaling);
 	// UE_LOG(LogTemp, Warning, TEXT("[MELEE RANGED SCALING] CurrentHealthCoefficient = %f, CurrentDamageCoefficient = %f."), currentHealthCoefficient, currentDamageCoefficient);

@@ -8,6 +8,7 @@
 #include "Components/SphereComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Heros/InteractableActor.h"
+#include "Data/GameplayTags.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -170,11 +171,13 @@ void ABarbarianCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(IA_Look, ETriggerEvent::Triggered, this, &ABarbarianCharacter::Look);
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &ABarbarianCharacter::JumpPressed);
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ABarbarianCharacter::StopJumping);
-		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &ABarbarianCharacter::DashPressed);
 		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &ABarbarianCharacter::InteractWithObject);
-		EnhancedInputComponent->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &ABarbarianCharacter::BasicAttackPressed);
-		EnhancedInputComponent->BindAction(IA_Massacre, ETriggerEvent::Started, this, &ABarbarianCharacter::MassacrePressed);
-		EnhancedInputComponent->BindAction(IA_Ultimate, ETriggerEvent::Started, this, &ABarbarianCharacter::ChainsOfRagePressed);
+		
+		// ASC Implementation
+		BindAbilityInput(EnhancedInputComponent, IA_Dash, GameplayTags::Input::Utility, [this]() { DashPressed(); });
+		BindAbilityInput(EnhancedInputComponent, IA_BasicAttack, GameplayTags::Input::BasicAttack, [this]() { BasicAttackPressed(); });
+		BindAbilityInput(EnhancedInputComponent, IA_Massacre, GameplayTags::Input::Ability1, [this]() { MassacrePressed(); });
+		BindAbilityInput(EnhancedInputComponent, IA_Ultimate, GameplayTags::Input::Ultimate, [this]() { ChainsOfRagePressed(); });
 	}
 }
 
@@ -626,16 +629,27 @@ float ABarbarianCharacter::TakeDamage(float DamageAmount, struct FDamageEvent co
 		return 0.0f;
 	}
 
+	// The base class applies this hit to the GAS Health attribute; HandleHealthChanged mirrors it back
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	CurrentHealth = FMath::Clamp(CurrentHealth - ActualDamage, 0.0f, MaxHealth);
-	//UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), ActualDamage, CurrentHealth);
 
-	if(CurrentHealth <= 0.0f)
+	return ActualDamage;
+}
+
+void ABarbarianCharacter::HandleHealthChanged(float OldHealth, float NewHealth)
+{
+	CurrentHealth = NewHealth;
+	// UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), OldHealth - NewHealth, CurrentHealth);
+
+	if(OldHealth > 0.0f && NewHealth <= 0.0f)
 	{
 		//die
 	}
-	
-	return ActualDamage;
+}
+
+void ABarbarianCharacter::GetDefaultHealth(float& OutHealth, float& OutMaxHealth) const
+{
+	OutHealth = CurrentHealth;
+	OutMaxHealth = MaxHealth;
 }
 // END DEFENSE
 

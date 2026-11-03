@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "Heros/HeroCharacterBase.h"
 #include "Logging/LogMacros.h"
 #include "InteractionParams.h"
 #include "WizardCharacter.generated.h"
@@ -19,7 +19,7 @@ struct FInputActionInstance;
 struct FInputActionValue;
 
 UCLASS()
-class PROJECT_ISILON_2_API AWizardCharacter : public ACharacter
+class PROJECT_ISILON_2_API AWizardCharacter : public AHeroCharacterBase
 {
 	GENERATED_BODY()
 
@@ -107,6 +107,8 @@ private:
 	float MaxHealth = 200.0f;
 	
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	virtual void HandleHealthChanged(float OldHealth, float NewHealth) override;
+	virtual void GetDefaultHealth(float& OutHealth, float& OutMaxHealth) const override;
 
 	UFUNCTION()
 	void OnRep_CurrentHealth();

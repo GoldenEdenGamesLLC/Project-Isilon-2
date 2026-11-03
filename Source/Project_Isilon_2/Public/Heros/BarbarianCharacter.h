@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "Heros/HeroCharacterBase.h"
 #include "Logging/LogMacros.h"
 #include "InteractionParams.h"
 #include "BarbarianCharacter.generated.h"
@@ -36,7 +36,7 @@ struct FChainsOfRageKnockbackData
 };
 
 UCLASS()
-class PROJECT_ISILON_2_API ABarbarianCharacter : public ACharacter
+class PROJECT_ISILON_2_API ABarbarianCharacter : public AHeroCharacterBase
 {
 	GENERATED_BODY()
 	
@@ -64,6 +64,7 @@ private:
 	// ===========================================
 	// Jump
 	// ===========================================
+
 	int32 JumpTotals = 0;
 	bool bCanJumpCooldown = true;
 	FTimerHandle JumpCooldownTimerHandle;
@@ -77,6 +78,7 @@ private:
 	// ===========================================
 	// Dash
 	// ===========================================
+	
 	bool bCanDash = true;
 	bool bIsDashing = false;
 	bool bDashStartedOnGround = false;
@@ -328,6 +330,8 @@ private:
 	float MaxHealth = 200.0f;
 	
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	virtual void HandleHealthChanged(float OldHealth, float NewHealth) override;
+	virtual void GetDefaultHealth(float& OutHealth, float& OutMaxHealth) const override;
 
 	UFUNCTION()
 	void OnRep_CurrentHealth();

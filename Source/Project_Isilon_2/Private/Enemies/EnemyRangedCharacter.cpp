@@ -5,6 +5,8 @@
 #include "Enemies/EnemyRangedAIController.h"
 #include "Data/EnemySpawner.h"
 #include "Data/EnemyAIStats.h"
+#include "Data/GameplayTags.h"
+#include "Libraries/GameplayAbilitySystemLibrary.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -102,13 +104,21 @@ float AEnemyRangedCharacter::TakeDamage(float DamageAmount, struct FDamageEvent 
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	RangedEnemyCurrentHealth = FMath::Clamp(RangedEnemyCurrentHealth - ActualDamage, 0.0f, MaxHealth);
+	// Health now lives in GAS; HandleHealthChanged mirrors it back and handles death
+	TMap<FGameplayTag, float> DamageByType;
+	DamageByType.Add(GameplayTags::Combat::DamageTypes::Physical, ActualDamage);
+	UGameplayAbilitySystemLibrary::ApplyGASDamage(this, DamageCauser, EventInstigator, DamageByType);
 
-	UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), ActualDamage, RangedEnemyCurrentHealth);
+	return ActualDamage;
+}
 
-	if(RangedEnemyCurrentHealth <= 0.0f)
+void AEnemyRangedCharacter::HandleHealthChanged(float OldHealth, float NewHealth)
+{
+	RangedEnemyCurrentHealth = NewHealth;
+	UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), OldHealth - NewHealth, RangedEnemyCurrentHealth);
+
+	if(bPoolActive && OldHealth > 0.0f && NewHealth <= 0.0f)
 	{
-		RangedEnemyCurrentHealth = 0.0f;
 		if(IsValid(OwningSpawner.Get()))
 		{
 			OwningSpawner.Get()->ReturnRangedEnemyToPool(this);
@@ -118,8 +128,6 @@ float AEnemyRangedCharacter::TakeDamage(float DamageAmount, struct FDamageEvent 
 			DeactivateForPool();
 		}
 	}
-	
-	return ActualDamage;
 }
 
 void AEnemyRangedCharacter::OnRep_RangedEnemyCurrentHealth()
@@ -238,6 +246,7 @@ void AEnemyRangedCharacter::ApplyDifficulty(const UEnemyAIStats* DifficultyStats
 
 		MaxHealth = RangedEnemyBaseHealth;
 		RangedEnemyCurrentHealth = MaxHealth;
+		InitHealthAttributes(MaxHealth);
 		Damage = BaseDamage;
 
 		return;
@@ -251,6 +260,7 @@ void AEnemyRangedCharacter::ApplyDifficulty(const UEnemyAIStats* DifficultyStats
 	
 	MaxHealth = RangedEnemyBaseHealth * currentHealthCoefficient;
 	RangedEnemyCurrentHealth = MaxHealth;
+	InitHealthAttributes(MaxHealth);
 	Damage = BaseDamage * currentDamageCoefficient;
 	
 	// UE_LOG(LogTemp, Warning, TEXT("[DIFFICULTY] %s | RuntimeCoefficient: %.3f | HealthScale: %.3f | DamageScale: %.3f"),*GetName(), RuntimeCoefficient, HealthScaling, DamageScaling);

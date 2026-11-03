@@ -8,6 +8,7 @@
 #include "Components/SphereComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Heros/InteractableActor.h"
+#include "Data/GameplayTags.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -117,7 +118,11 @@ void AWizardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &AWizardCharacter::JumpPressed);
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &AWizardCharacter::StopJumping);
 		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &AWizardCharacter::InteractWithObject);
-		EnhancedInputComponent->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &AWizardCharacter::BasicAttackPressed);
+		
+		// BindAbilityInput(EnhancedInputComponent, IA_Dash, GameplayTags::Input::Dash);
+		BindAbilityInput(EnhancedInputComponent, IA_BasicAttack, GameplayTags::Input::BasicAttack, [this]() { BasicAttackPressed(); });
+		BindAbilityInput(EnhancedInputComponent, IA_Utility, GameplayTags::Input::Utility);
+		BindAbilityInput(EnhancedInputComponent, IA_Ultimate, GameplayTags::Input::Ultimate);
 	}
 }
 
@@ -363,16 +368,27 @@ float AWizardCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const
 		return 0.0f;
 	}
 
+	// The base class applies this hit to the GAS Health attribute; HandleHealthChanged mirrors it back
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	CurrentHealth = FMath::Clamp(CurrentHealth - ActualDamage, 0.0f, MaxHealth);
-	//UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), ActualDamage, CurrentHealth);
 
-	if(CurrentHealth <= 0.0f)
+	return ActualDamage;
+}
+
+void AWizardCharacter::HandleHealthChanged(float OldHealth, float NewHealth)
+{
+	CurrentHealth = NewHealth;
+	//UE_LOG(LogTemp, Warning, TEXT("[SERVER] %s took %.1f damage. Health: %.1f"), *GetName(), OldHealth - NewHealth, CurrentHealth);
+
+	if(OldHealth > 0.0f && NewHealth <= 0.0f)
 	{
 		//die
 	}
-	
-	return ActualDamage;
+}
+
+void AWizardCharacter::GetDefaultHealth(float& OutHealth, float& OutMaxHealth) const
+{
+	OutHealth = CurrentHealth;
+	OutMaxHealth = MaxHealth;
 }
 // END DEFENSE
 
