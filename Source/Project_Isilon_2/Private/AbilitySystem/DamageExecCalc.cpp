@@ -19,6 +19,7 @@ namespace
 
 		// Target
 		FGameplayEffectAttributeCaptureDefinition ArmorDef;
+		FGameplayEffectAttributeCaptureDefinition LightningResistanceDef;
 		FGameplayEffectAttributeCaptureDefinition FireResistanceDef;
 		FGameplayEffectAttributeCaptureDefinition FrostResistanceDef;
 		FGameplayEffectAttributeCaptureDefinition PoisonResistanceDef;
@@ -34,11 +35,13 @@ namespace
 			CritMultiplierDef = FGameplayEffectAttributeCaptureDefinition(UTagAttributeSet::GetCritMultiplierAttribute(), EGameplayEffectAttributeCaptureSource::Source, false);
 
 			ArmorDef = FGameplayEffectAttributeCaptureDefinition(UTagAttributeSet::GetArmorAttribute(), EGameplayEffectAttributeCaptureSource::Target, false);
+			LightningResistanceDef = FGameplayEffectAttributeCaptureDefinition(UTagAttributeSet::GetLightningResistanceAttribute(), EGameplayEffectAttributeCaptureSource::Target, false);
 			FireResistanceDef = FGameplayEffectAttributeCaptureDefinition(UTagAttributeSet::GetFireResistanceAttribute(), EGameplayEffectAttributeCaptureSource::Target, false);
 			FrostResistanceDef = FGameplayEffectAttributeCaptureDefinition(UTagAttributeSet::GetFrostResistanceAttribute(), EGameplayEffectAttributeCaptureSource::Target, false);
 			PoisonResistanceDef = FGameplayEffectAttributeCaptureDefinition(UTagAttributeSet::GetPoisonResistanceAttribute(), EGameplayEffectAttributeCaptureSource::Target, false);
 
 			using namespace GameplayTags::Combat::DamageTypes;
+			ElementalResistances.Add(Lightning, LightningResistanceDef);
 			ElementalResistances.Add(Fire, FireResistanceDef);
 			ElementalResistances.Add(Frost, FrostResistanceDef);
 			ElementalResistances.Add(Poison, PoisonResistanceDef);
@@ -68,6 +71,7 @@ UDamageExecCalc::UDamageExecCalc()
 	RelevantAttributesToCapture.Add(Statics.CritChanceDef);
 	RelevantAttributesToCapture.Add(Statics.CritMultiplierDef);
 	RelevantAttributesToCapture.Add(Statics.ArmorDef);
+	RelevantAttributesToCapture.Add(Statics.LightningResistanceDef);
 	RelevantAttributesToCapture.Add(Statics.FireResistanceDef);
 	RelevantAttributesToCapture.Add(Statics.FrostResistanceDef);
 	RelevantAttributesToCapture.Add(Statics.PoisonResistanceDef);

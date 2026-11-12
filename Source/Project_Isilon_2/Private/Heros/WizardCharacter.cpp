@@ -482,16 +482,24 @@ void AWizardCharacter::PerformBasicAttack(FRotator AimRotation)
 
 	// Matches the cases in MulticastBasicAttackFX
 	uint8 ElementalDamageType = 0;
-	if(DamageType == GameplayTags::Combat::DamageTypes::Fire)
+	if(DamageType == GameplayTags::Combat::DamageTypes::Lightning)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Lightning."));
+		ElementalDamageType = 1;
+	}
+	else if(DamageType == GameplayTags::Combat::DamageTypes::Fire)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Fire."));
 		ElementalDamageType = 2;
 	}
 	else if(DamageType == GameplayTags::Combat::DamageTypes::Poison)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Poison."));
 		ElementalDamageType = 3;
 	}
 	else if(DamageType == GameplayTags::Combat::DamageTypes::Frost)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Frost."));
 		ElementalDamageType = 4;
 	}
 

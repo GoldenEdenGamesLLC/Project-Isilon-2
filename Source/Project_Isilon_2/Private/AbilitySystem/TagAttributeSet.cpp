@@ -16,6 +16,7 @@ UTagAttributeSet::UTagAttributeSet()
 	InitCritChance(0.0f);
 	InitCritMultiplier(1.5f);
 	InitArmor(0.0f);
+	InitLightningResistance(0.0f);
 	InitFireResistance(0.0f);
 	InitFrostResistance(0.0f);
 	InitPoisonResistance(0.0f);
@@ -33,6 +34,7 @@ void UTagAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, CritChance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, CritMultiplier, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, LightningResistance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, FireResistance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, FrostResistance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, PoisonResistance, COND_None, REPNOTIFY_Always);
@@ -120,6 +122,11 @@ void UTagAttributeSet::OnRep_CritMultiplier(const FGameplayAttributeData& OldVal
 void UTagAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UTagAttributeSet, Armor, OldValue);
+}
+
+void UTagAttributeSet::OnRep_LightningResistance(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UTagAttributeSet, LightningResistance, OldValue);
 }
 
 void UTagAttributeSet::OnRep_FireResistance(const FGameplayAttributeData& OldValue)

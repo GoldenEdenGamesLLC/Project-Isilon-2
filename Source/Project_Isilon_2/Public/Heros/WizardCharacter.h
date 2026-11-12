@@ -87,7 +87,7 @@ private:
 	float BasicAttackStartDistance = 40.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
-	float BasicAttackEndDistance = 500.0f;
+	float BasicAttackEndDistance = 2000.0f;
 
 	void BasicAttackPressed();
 	void PerformBasicAttack(FRotator AimRotation);

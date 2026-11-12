@@ -74,6 +74,10 @@ public:
 	ATTRIBUTE_ACCESSORS(UTagAttributeSet, Armor)
 
 	// Resistances are 0..1 (0.25 = 25% less damage of that type)
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_LightningResistance, Category = "Defense")
+	FGameplayAttributeData LightningResistance;
+	ATTRIBUTE_ACCESSORS(UTagAttributeSet, LightningResistance)
+	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_FireResistance, Category = "Defense")
 	FGameplayAttributeData FireResistance;
 	ATTRIBUTE_ACCESSORS(UTagAttributeSet, FireResistance)
@@ -115,6 +119,9 @@ protected:
 
 	UFUNCTION()
 	void OnRep_Armor(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_LightningResistance(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
 	void OnRep_FireResistance(const FGameplayAttributeData& OldValue);
