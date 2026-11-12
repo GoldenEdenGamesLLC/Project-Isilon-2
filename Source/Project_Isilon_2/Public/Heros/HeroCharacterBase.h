@@ -11,8 +11,6 @@
 class UHeroAbilitySystemComponent;
 class UTagAttributeSet;
 class UHeroData;
-class UEnhancedInputComponent;
-class UInputAction;
 struct FOnAttributeChangeData;
 
 /**
@@ -51,16 +49,11 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	/**
-	 * Binds an input action to an ability input tag.
-	 * Pressed: activates the ability granted with InputTag; if the hero has none yet, calls LegacyHandler instead.
-	 * Released: forwards the release to the ability.
-	 * Lets each input move to GAS on its own, just by adding the ability to the hero's UHeroData.
+	 * Server only. Deals Amount of DamageType (a Combat.DamageType.* tag) to Target through GAS,
+	 * so this hero's stats (AttackPower, SpellPower, Crit) and the target's defenses apply.
+	 * Use this instead of UGameplayStatics::ApplyDamage in hero attacks.
 	 */
-	void BindAbilityInput(UEnhancedInputComponent* EnhancedInputComponent, const UInputAction* Action, const FGameplayTag& InputTag, TFunction<void()> LegacyHandler = nullptr);
-
-	// Returns true if an ability handled this input
-	bool TryAbilityInputPressed(const FGameplayTag& InputTag);
-	void AbilityInputReleased(const FGameplayTag& InputTag);
+	bool DealDamage(AActor* Target, float Amount, const FGameplayTag& DamageType);
 
 	// Starting Health / MaxHealth used when HeroData has no InitAttributesEffect
 	virtual void GetDefaultHealth(float& OutHealth, float& OutMaxHealth) const;
@@ -68,7 +61,7 @@ protected:
 	// Server only. Called whenever the GAS Health attribute changes.
 	virtual void HandleHealthChanged(float OldHealth, float NewHealth) {}
 
-	// Abilities, attributes and class tag for this hero. Set on each hero Blueprint.
+	// Starting stats for this hero. Set on each hero Blueprint.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
 	TObjectPtr<UHeroData> HeroData;
 

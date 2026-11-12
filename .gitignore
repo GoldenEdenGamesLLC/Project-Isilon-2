@@ -41,6 +41,7 @@
 *.VC.db
 *.VC.opendb
 .vsconfig
+GAS_Setup.md
 
 # Precompiled Assets
 SourceArt/**/*.png

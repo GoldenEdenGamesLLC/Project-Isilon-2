@@ -239,14 +239,7 @@ void AEnemyCharacter::ApplyDifficulty(const UEnemyAIStats* DifficultyStats, floa
 	const float currentHealthCoefficient = DifficultyStats->GetEnemyHealthCoefficient() * HealthScaling;
 	const float currentDamageCoefficient = DifficultyStats->GetEnemyDamageCoefficient() * DamageScaling;
 	
-	if(SpeedsVariations.Num() > 0 && HealthVariations.Num() > 0)
-	{
-		RandomIndex = 0;
-		RandomIndex = FMath::RandRange(0, SpeedsVariations.Num() - 1);
-
-		GetCharacterMovement()->MaxWalkSpeed = SpeedsVariations[RandomIndex];
-		MeleeEnemyBaseHealth = HealthVariations[RandomIndex];
-	}
+	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 	
 	MaxHealth = MeleeEnemyBaseHealth * currentHealthCoefficient;
 	MeleeEnemyCurrentHealth = MaxHealth;

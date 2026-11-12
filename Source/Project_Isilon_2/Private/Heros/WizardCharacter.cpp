@@ -9,6 +9,7 @@
 #include "Camera/CameraComponent.h"
 #include "Heros/InteractableActor.h"
 #include "Data/GameplayTags.h"
+#include "Libraries/GameplayAbilitySystemLibrary.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -33,6 +34,10 @@ AWizardCharacter::AWizardCharacter()
 {
  	bReplicates = true;
 	SetReplicateMovement(true);
+
+	BasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Fire);
+	BasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Frost);
+	BasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Poison);
 
 	//spring arm
 	cameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -118,11 +123,7 @@ void AWizardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &AWizardCharacter::JumpPressed);
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &AWizardCharacter::StopJumping);
 		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &AWizardCharacter::InteractWithObject);
-		
-		// BindAbilityInput(EnhancedInputComponent, IA_Dash, GameplayTags::Input::Dash);
-		BindAbilityInput(EnhancedInputComponent, IA_BasicAttack, GameplayTags::Input::BasicAttack, [this]() { BasicAttackPressed(); });
-		BindAbilityInput(EnhancedInputComponent, IA_Utility, GameplayTags::Input::Utility);
-		BindAbilityInput(EnhancedInputComponent, IA_Ultimate, GameplayTags::Input::Ultimate);
+		EnhancedInputComponent->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &AWizardCharacter::BasicAttackPressed);
 	}
 }
 
@@ -460,6 +461,9 @@ void AWizardCharacter::PerformBasicAttack(FRotator AimRotation)
 
 	bool bHit = GetWorld()->SweepMultiByChannel(HitResults, AttackStart, End, FQuat::Identity, ECC_Pawn, AttackSweep, QueryParams);
 
+	// One element for the whole attack so the damage and the FX match
+	const FGameplayTag DamageType = UGameplayAbilitySystemLibrary::GetRandomTagFromContainer(BasicAttackDamageTypes);
+
 	TSet<AActor*> damagedActors;
 	if(bHit)
 	{
@@ -471,12 +475,25 @@ void AWizardCharacter::PerformBasicAttack(FRotator AimRotation)
 				UE_LOG(LogTemp, Warning, TEXT("[SERVER] Basic Attack Hit: %s"), *HitActor->GetName());
 				damagedActors.Add(HitActor);
 
-				UGameplayStatics::ApplyDamage(HitActor, BasicAttackDamage /*Change to be the wizard spell calc*/, GetController(), this, UDamageType::StaticClass() /*Change to be the type of damage hitting the enemies*/);
+				DealDamage(HitActor, BasicAttackDamage, DamageType);
 			}
 		}
 	}
 
+	// Matches the cases in MulticastBasicAttackFX
 	uint8 ElementalDamageType = 0;
+	if(DamageType == GameplayTags::Combat::DamageTypes::Fire)
+	{
+		ElementalDamageType = 2;
+	}
+	else if(DamageType == GameplayTags::Combat::DamageTypes::Poison)
+	{
+		ElementalDamageType = 3;
+	}
+	else if(DamageType == GameplayTags::Combat::DamageTypes::Frost)
+	{
+		ElementalDamageType = 4;
+	}
 
 	MulticastBasicAttackFX(AttackStart, End, bHit, ElementalDamageType);
 

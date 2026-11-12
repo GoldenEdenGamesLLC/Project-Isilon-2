@@ -138,7 +138,7 @@ private:
 	float BasicAttackSpeed = 0.75f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
-	float BasicAttackDamage = 125.0f;
+	float BasicAttackDamage = 35.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
 	float BasicAttackHalfHeight = 50.0f;
@@ -327,7 +327,7 @@ private:
 	float CurrentHealth = 144.0f;
 	
 	float BaseHealth = 144.0f;
-	float MaxHealth = 200.0f;
+	float MaxHealth = 144.0f;
 	
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 	virtual void HandleHealthChanged(float OldHealth, float NewHealth) override;

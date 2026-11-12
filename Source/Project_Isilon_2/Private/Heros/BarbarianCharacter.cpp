@@ -174,10 +174,10 @@ void ABarbarianCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &ABarbarianCharacter::InteractWithObject);
 		
 		// ASC Implementation
-		BindAbilityInput(EnhancedInputComponent, IA_Dash, GameplayTags::Input::Utility, [this]() { DashPressed(); });
-		BindAbilityInput(EnhancedInputComponent, IA_BasicAttack, GameplayTags::Input::BasicAttack, [this]() { BasicAttackPressed(); });
-		BindAbilityInput(EnhancedInputComponent, IA_Massacre, GameplayTags::Input::Ability1, [this]() { MassacrePressed(); });
-		BindAbilityInput(EnhancedInputComponent, IA_Ultimate, GameplayTags::Input::Ultimate, [this]() { ChainsOfRagePressed(); });
+		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &ABarbarianCharacter::DashPressed);
+		EnhancedInputComponent->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &ABarbarianCharacter::BasicAttackPressed);
+		EnhancedInputComponent->BindAction(IA_Massacre, ETriggerEvent::Started, this, &ABarbarianCharacter::MassacrePressed);
+		EnhancedInputComponent->BindAction(IA_Ultimate, ETriggerEvent::Started, this, &ABarbarianCharacter::ChainsOfRagePressed);
 	}
 }
 
@@ -385,7 +385,7 @@ void ABarbarianCharacter::HandleDashDamage()
 				UE_LOG(LogTemp, Warning, TEXT("[SERVER] Dash Damage: %s"), *HitActor->GetName());
 				damagedActorsByDash.Add(HitActor);
 
-				UGameplayStatics::ApplyDamage(HitActor, DashDamage, GetController(), this, UDamageType::StaticClass());
+				DealDamage(HitActor, DashDamage, GameplayTags::Combat::DamageTypes::Physical);
 			}
 		}
 	}
@@ -517,7 +517,7 @@ void ABarbarianCharacter::PerformBasicAttack(FRotator AimRotation)
 				UE_LOG(LogTemp, Warning, TEXT("[SERVER] Basic Attack Hit: %s"), *HitActor->GetName());
 				damagedActors.Add(HitActor);
 				
-				UGameplayStatics::ApplyDamage(HitActor, BasicAttackDamage, GetController(), this, UDamageType::StaticClass());
+				DealDamage(HitActor, BasicAttackDamage, GameplayTags::Combat::DamageTypes::Physical);
 			}
 		}
 	}
@@ -729,7 +729,7 @@ void ABarbarianCharacter::PerformMassacre()
 					UE_LOG(LogTemp, Warning, TEXT("[MASSACRE SERVER] Massacre Attack Hit: %s"), *HitActor->GetName());
 					damagedActors.Add(HitActor);
 					
-					UGameplayStatics::ApplyDamage(HitActor, MassacreAttackDamage, GetController(), this, UDamageType::StaticClass());
+					DealDamage(HitActor, MassacreAttackDamage, GameplayTags::Combat::DamageTypes::Physical);
 				}
 			}
 		}
@@ -1118,7 +1118,7 @@ void ABarbarianCharacter::ChainsOfRageSlam()
 		}
 
 		//damage
-		UGameplayStatics::ApplyDamage(EnemyActor, ChainsOfRageReactivationBaseDamage, GetController(), this, UDamageType::StaticClass());
+		DealDamage(EnemyActor, ChainsOfRageReactivationBaseDamage, GameplayTags::Combat::DamageTypes::Physical);
 
 		//launch
 		if(ACharacter* EnemyCharacter = Cast<ACharacter>(EnemyActor))

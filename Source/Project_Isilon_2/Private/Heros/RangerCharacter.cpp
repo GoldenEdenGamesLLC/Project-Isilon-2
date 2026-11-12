@@ -118,12 +118,6 @@ void ARangerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &ARangerCharacter::JumpPressed);
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ARangerCharacter::StopJumping);
 		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &ARangerCharacter::InteractWithObject);
-
-		// No C++ version yet: these only do something once the ability is in DA_Hero_Ranger
-		BindAbilityInput(EnhancedInputComponent, IA_BasicAttack, GameplayTags::Input::BasicAttack);
-		// BindAbilityInput(EnhancedInputComponent, IA_Dash, GameplayTags::Input::Dash);
-		BindAbilityInput(EnhancedInputComponent, IA_Utility, GameplayTags::Input::Utility);
-		BindAbilityInput(EnhancedInputComponent, IA_Ultimate, GameplayTags::Input::Ultimate);
 	}
 }
 

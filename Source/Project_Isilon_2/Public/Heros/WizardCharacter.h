@@ -73,6 +73,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
 	float BasicAttackDamage = 125.0f;
 
+	// Chaos damage: each basic attack picks one of these damage types at random
+	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack", meta = (Categories = "Combat.DamageType"))
+	FGameplayTagContainer BasicAttackDamageTypes;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
 	float BasicAttackHalfHeight = 50.0f;
 
@@ -101,10 +105,10 @@ private:
 	// ===========================================
 	
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, EditDefaultsOnly, Category = "Defense")
-	float CurrentHealth = 108.0f;
+	float CurrentHealth = 96.0f;
 	
-	float BaseHealth = 108.0f;
-	float MaxHealth = 200.0f;
+	float BaseHealth = 96.0f;
+	float MaxHealth = 96.0f;
 	
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 	virtual void HandleHealthChanged(float OldHealth, float NewHealth) override;

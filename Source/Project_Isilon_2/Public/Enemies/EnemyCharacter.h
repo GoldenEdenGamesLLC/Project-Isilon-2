@@ -29,10 +29,10 @@ protected:
 	// ===========================================
 
 	UPROPERTY(EditDefaultsOnly, Category="Stats")
-	float MeleeEnemyBaseHealth = 120.0f;
+	float MeleeEnemyBaseHealth = 55.0f;
 
 	UPROPERTY(ReplicatedUsing = OnRep_MeleeEnemyCurrentHealth, VisibleAnywhere, BlueprintReadOnly, Category="Stats")
-	float MeleeEnemyCurrentHealth = 120.0f;
+	float MeleeEnemyCurrentHealth = 55.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Stats")
 	float BaseDamage = 8.0f;
@@ -85,9 +85,8 @@ protected:
 
 	void ApplyPoolState();
 
-	TArray<uint16> HealthVariations = { 300, 275, 250 };
-	TArray<uint16> SpeedsVariations = { 350, 400, 450 };
-	int16 RandomIndex = 0;
+	uint16 MovementSpeed = 350;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

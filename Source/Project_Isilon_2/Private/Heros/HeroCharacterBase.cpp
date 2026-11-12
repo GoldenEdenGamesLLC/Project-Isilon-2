@@ -10,9 +10,6 @@
 #include "Game/HeroPlayerState.h"
 #include "Libraries/GameplayAbilitySystemLibrary.h"
 
-#include "EnhancedInputComponent.h"
-#include "InputActionValue.h"
-
 AHeroCharacterBase::AHeroCharacterBase()
 {
 	
@@ -132,53 +129,15 @@ void AHeroCharacterBase::GetDefaultHealth(float& OutHealth, float& OutMaxHealth)
 	OutMaxHealth = 100.0f;
 }
 
-void AHeroCharacterBase::BindAbilityInput(UEnhancedInputComponent* EnhancedInputComponent, const UInputAction* Action, const FGameplayTag& InputTag, TFunction<void()> LegacyHandler)
+bool AHeroCharacterBase::DealDamage(AActor* Target, float Amount, const FGameplayTag& DamageType)
 {
-	if(!EnhancedInputComponent || !Action)
+	if(!HasAuthority() || Amount <= 0.0f || !DamageType.IsValid())
 	{
-		return;
+		return false;
 	}
 
-	TWeakObjectPtr<AHeroCharacterBase> WeakThis(this);
+	TMap<FGameplayTag, float> DamageByType;
+	DamageByType.Add(DamageType, Amount);
 
-	EnhancedInputComponent->BindActionValueLambda(Action, ETriggerEvent::Started, [WeakThis, InputTag, LegacyHandler](const FInputActionValue&)
-	{
-		AHeroCharacterBase* Self = WeakThis.Get();
-		if(!Self)
-		{
-			return;
-		}
-
-		if(Self->TryAbilityInputPressed(InputTag))
-		{
-			return;
-		}
-
-		if(LegacyHandler)
-		{
-			LegacyHandler();
-		}
-	});
-
-	EnhancedInputComponent->BindActionValueLambda(Action, ETriggerEvent::Completed, [WeakThis, InputTag](const FInputActionValue&)
-	{
-		if(AHeroCharacterBase* Self = WeakThis.Get())
-		{
-			Self->AbilityInputReleased(InputTag);
-		}
-	});
-}
-
-bool AHeroCharacterBase::TryAbilityInputPressed(const FGameplayTag& InputTag)
-{
-	UHeroAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
-	return ASC && ASC->AbilityInputTagPressed(InputTag);
-}
-
-void AHeroCharacterBase::AbilityInputReleased(const FGameplayTag& InputTag)
-{
-	if(UHeroAbilitySystemComponent* ASC = AbilitySystemComponent.Get())
-	{
-		ASC->AbilityInputTagReleased(InputTag);
-	}
+	return UGameplayAbilitySystemLibrary::ApplyGASDamage(Target, this, GetController(), DamageByType);
 }

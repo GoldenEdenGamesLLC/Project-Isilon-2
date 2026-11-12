@@ -27,10 +27,10 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Health")
-	float RangedEnemyBaseHealth = 55.0f;
+	float RangedEnemyBaseHealth = 35.0f;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_RangedEnemyCurrentHealth, VisibleAnywhere, BlueprintReadOnly, Category="Health")
-	float RangedEnemyCurrentHealth = 55.0f;
+	float RangedEnemyCurrentHealth = 35.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Stats")
 	float BaseDamage = 12.0f;
