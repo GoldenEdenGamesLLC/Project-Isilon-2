@@ -35,6 +35,7 @@ AWizardCharacter::AWizardCharacter()
  	bReplicates = true;
 	SetReplicateMovement(true);
 
+	BasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Lightning);
 	BasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Fire);
 	BasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Frost);
 	BasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Poison);
