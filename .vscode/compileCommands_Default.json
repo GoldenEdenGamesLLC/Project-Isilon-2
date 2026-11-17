@@ -1,81 +1,465 @@
 [
 	{
-		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\BarbarianCharacter.cpp",
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\FabToolset\\Private\\FabToolset.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.0.rsp"
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\FabToolset.0.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
 	},
 	{
-		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\EnemyAIController.cpp",
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\FabToolset\\Private\\FabToolsetModule.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.0.rsp"
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\FabToolset.0.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
 	},
 	{
-		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\EnemyAIStats.cpp",
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\FabActiveWorkflowRegistry.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.0.rsp"
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
 	},
 	{
-		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\EnemyCharacter.cpp",
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\FabAuthentication.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.0.rsp"
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
 	},
 	{
-		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\EnemyRangedAIController.cpp",
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\FabBrowser.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.0.rsp"
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
 	},
 	{
-		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\EnemyRangedCharacter.cpp",
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\FabBrowserApi.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.0.rsp"
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
 	},
 	{
-		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\EnemySpawner.cpp",
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\FabConsoleCommands.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.0.rsp"
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
 	},
 	{
-		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\InteractableActor.cpp",
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\FabDownloader.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.0.rsp"
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
 	},
 	{
-		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\JumpNavLinkProxy.cpp",
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\FabModule.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.0.rsp"
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
 	},
 	{
-		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\PlayerAnimInstance.cpp",
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\FabSettings.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.0.rsp"
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\FabSettingsCustomization.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\FabWebLog.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\FabWorkflowFactoryRegistry.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Importers\\ActorSpawner.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Importers\\FabDragDropOp.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Importers\\GenericAssetImporter.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Importers\\QuixelGLTFImporter.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Pipelines\\Factories\\InterchangeInstancedFoliageTypeFactory.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Pipelines\\InterchangeMegascansPipeline.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Pipelines\\Nodes\\InterchangeInstancedFoliageTypeFactoryNode.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Teds\\FabContentSource.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Teds\\FabMyFolderIntegration.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Utilities\\AssetUtils.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Utilities\\DragImportOperation.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Utilities\\FabAssetsCache.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Utilities\\QuixelAssetTypes.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Workflows\\FabWorkflow.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Workflows\\GenericDragDropWorkflow.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Workflows\\GenericImportWorkflow.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Workflows\\MetaHumanImportWorkflow.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Workflows\\PackImportWorkflow.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Workflows\\PluginInstallWorkflow.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Workflows\\QuixelDragDropWorkflow.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Plugins\\Fab\\Source\\Fab\\Private\\Workflows\\QuixelImportWorkflow.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Fab.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\AbilitySystem\\DamageExecCalc.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\AbilitySystem\\GE_Damage.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\AbilitySystem\\HeroAbilitySystemComponent.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\AbilitySystem\\TagAttributeSet.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Data\\EnemyAIStats.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Data\\EnemySpawner.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Data\\GameplayTags.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Enemies\\EnemyAIController.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Enemies\\EnemyCharacter.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Enemies\\EnemyCharacterBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Enemies\\EnemyRangedAIController.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Enemies\\EnemyRangedCharacter.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Enemies\\JumpNavLinkProxy.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Game\\CharSelectionPlayerController.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Game\\CharacterSelectionGameMode.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Game\\HeroPlayerState.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Heros\\BarbarianCharacter.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Heros\\HeroCharacterBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Heros\\InteractableActor.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Heros\\PlayerAnimInstance.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Heros\\RangerCharacter.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Heros\\WizardCharacter.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Interfaces\\EnemyInterface.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
+	},
+	{
+		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Private\\Libraries\\GameplayAbilitySystemLibrary.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
 	},
@@ -83,7 +467,7 @@
 		"file": "C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\Source\\Project_Isilon_2\\Project_Isilon_2.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.0.rsp"
+			"@C:\\dev\\Work\\Project Isilon 2\\Project_Isilon_2\\.vscode\\compileCommands_Default\\Project_Isilon_2.2.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Source"
 	}

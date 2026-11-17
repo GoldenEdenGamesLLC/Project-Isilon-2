@@ -28,6 +28,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "DrawDebugHelpers.h"
+#include "Math/ColorList.h"
 
 // Sets default values
 AWizardCharacter::AWizardCharacter()
@@ -35,10 +36,10 @@ AWizardCharacter::AWizardCharacter()
  	bReplicates = true;
 	SetReplicateMovement(true);
 
-	BasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Lightning);
-	BasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Fire);
-	BasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Frost);
-	BasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Poison);
+	ElementalBasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Lightning);
+	ElementalBasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Fire);
+	ElementalBasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Frost);
+	ElementalBasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Poison);
 
 	//spring arm
 	cameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -125,6 +126,7 @@ void AWizardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &AWizardCharacter::StopJumping);
 		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &AWizardCharacter::InteractWithObject);
 		EnhancedInputComponent->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &AWizardCharacter::BasicAttackPressed);
+		EnhancedInputComponent->BindAction(IA_ControlledChaos, ETriggerEvent::Started, this, &AWizardCharacter::ControlledChaosBlastPressed);
 	}
 }
 
@@ -462,8 +464,13 @@ void AWizardCharacter::PerformBasicAttack(FRotator AimRotation)
 
 	bool bHit = GetWorld()->SweepMultiByChannel(HitResults, AttackStart, End, FQuat::Identity, ECC_Pawn, AttackSweep, QueryParams);
 
-	// One element for the whole attack so the damage and the FX match
-	const FGameplayTag DamageType = UGameplayAbilitySystemLibrary::GetRandomTagFromContainer(BasicAttackDamageTypes);
+	//DAMAGE TYPING FOR SPELLS
+	UE_LOG(LogTemp, Warning, TEXT("[WIZARD] bElementSelected = %s"), (bElementSelected ? TEXT("TRUE") : TEXT("FALSE")));
+	const FGameplayTag DamageType = bElementSelected //used in conjuction with right click
+	? 
+	UGameplayAbilitySystemLibrary::GetSpecificTagFromContainer(ElementalBasicAttackDamageTypes, ControlledChaosBlastElementalDamageType) 
+	: 
+	UGameplayAbilitySystemLibrary::GetRandomTagFromContainer(ElementalBasicAttackDamageTypes);
 
 	TSet<AActor*> damagedActors;
 	if(bHit)
@@ -481,16 +488,22 @@ void AWizardCharacter::PerformBasicAttack(FRotator AimRotation)
 		}
 	}
 
+	ElementalDamageType = bElementSelected ? ControlledChaosBlastElementalDamageType : 0;
 	// Matches the cases in MulticastBasicAttackFX
-	uint8 ElementalDamageType = 0;
+	// probably implement color variance by about 5% - 15% so its not too basic
 	if(DamageType == GameplayTags::Combat::DamageTypes::Lightning)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Lightning."));
-		ElementalDamageType = 1;
+		ElementalDamageType = 0;
 	}
 	else if(DamageType == GameplayTags::Combat::DamageTypes::Fire)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Fire."));
+		ElementalDamageType = 1;
+	}
+	else if(DamageType == GameplayTags::Combat::DamageTypes::Frost)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Frost."));
 		ElementalDamageType = 2;
 	}
 	else if(DamageType == GameplayTags::Combat::DamageTypes::Poison)
@@ -498,36 +511,44 @@ void AWizardCharacter::PerformBasicAttack(FRotator AimRotation)
 		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Poison."));
 		ElementalDamageType = 3;
 	}
-	else if(DamageType == GameplayTags::Combat::DamageTypes::Frost)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Frost."));
-		ElementalDamageType = 4;
-	}
 
-	MulticastBasicAttackFX(AttackStart, End, bHit, ElementalDamageType);
+	MulticastBasicAttackFX(AttackStart, End, bHit);
 
 	GetWorldTimerManager().SetTimer(BasicAttackCooldownTimerHandle, this, &AWizardCharacter::BasicAttackCompleted, BasicAttackSpeed, false);
 }
 
-void AWizardCharacter::MulticastBasicAttackFX_Implementation(FVector Start, FVector End, bool bHit, uint8 ElementalDamageType)
+void AWizardCharacter::MulticastBasicAttackFX_Implementation(FVector Start, FVector End, bool bHit)
 {
+	FColor ElementalType = FColor::Red;
+
+	const float ColorVariant = FMath::FRandRange(-2.5f, 2.5f);
+	// UE_LOG(LogTemp, Warning, TEXT("Color Variant Percentage : %f"), ColorVariant);
+
 	switch(ElementalDamageType)
 	{
-		case 1:
-		//lightning light blue
-		case 2:
-		//fire red orange
-		case 3:
-		//grass green
-		case 4:
-		//ice darker blue
+		case 0: //lightning
+			ElementalType = FColor(39 + ColorVariant, 224 + ColorVariant, 245 + ColorVariant);
+			
+			break;
+		case 1: //fire
+			ElementalType = FColor(245 + ColorVariant, 87 + ColorVariant, 39 + ColorVariant);
+			
+			break;
+		case 2: //ice
+			ElementalType = FColor(61 + ColorVariant, 169 + ColorVariant, 253 + ColorVariant);
+			
+			break;
+		case 3: //poison
+			ElementalType = FColor(96 + ColorVariant, 181 + ColorVariant, 102 + ColorVariant);
+			
+			break;
 		default:
 			break;
 	}
 
 	DrawDebugCapsule(GetWorld(), Start, BasicAttackHalfHeight, BasicAttackRadius, FQuat::Identity, FColor::Yellow, false, 1.0f);
 
-	DrawDebugCapsule(GetWorld(), End, BasicAttackHalfHeight, BasicAttackRadius, FQuat::Identity, bHit ? FColor::Red : FColor::Green, false, 1.0f);
+	DrawDebugCapsule(GetWorld(), End, BasicAttackHalfHeight, BasicAttackRadius, FQuat::Identity, ElementalType, false, 1.0f);
 }
 
 //resets basic attack cd
@@ -538,7 +559,90 @@ void AWizardCharacter::BasicAttackCompleted()
 
 // Basic Attack End
 
+// Start Controlled Chaos Attack
 
+void AWizardCharacter::ControlledChaosBlastPressed()
+{
+	if(HasAuthority())
+	{
+		ServerPerformControlledChaosBlast_Implementation();
+	}
+	else
+	{
+		ServerPerformControlledChaosBlast();
+	}
+}
+
+void AWizardCharacter::ServerPerformControlledChaosBlast_Implementation()
+{
+	if(!bCanControlChaosBlast)
+	{
+		return;
+	}
+	
+	//picking element
+	if(!bElementSelected && bCurrentlySelecting)
+	{
+		ControlledChaosBlastElementalDamageType = CurrentElement;
+		// UE_LOG(LogTemp, Warning, TEXT("[WIZARD] Currently selecting :%d."), ControlledChaosBlastElementalDamageType);
+		
+		//element has been chosen
+		bCanControlChaosBlast = false;
+		bElementSelected = true;
+		bCurrentlySelecting = false;
+		
+		//explosion
+		UE_LOG(LogTemp, Warning, TEXT("[WIZARD] Firing off explosion."));
+		ConeExplosion();
+	}
+
+	//wheel
+	if(!bElementSelected && !bCurrentlySelecting)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[WIZARD] Curently wheeling."));
+		bCurrentlySelecting = true;
+		SelectingElement();
+	}
+}
+
+void AWizardCharacter::ConeExplosion()
+{
+	//explosion math
+
+	//do sphere size of barbarian aa
+	//then do cone outside of that
+
+	GetWorldTimerManager().SetTimer(ResetControlledChaosCooldown, this, &AWizardCharacter::ResetControlledChaosBlastCompleted, ControlledChaosBlastCooldown, false);
+}
+
+void AWizardCharacter::SelectingElement()
+{
+	if(bCurrentlySelecting)
+	{
+		if(CurrentElement > 3)
+		{
+			CurrentElement = 0;
+		}
+	
+		UE_LOG(LogTemp, Warning, TEXT("[WIZARD] ELEMENT = %d."), CurrentElement);
+
+		GetWorldTimerManager().SetTimer(ControlledChaosChooseElementTimerHandle, this, &AWizardCharacter::SelectingElement, ControlledChaosBlastNextElementTime, true);
+		CurrentElement++;
+	}
+}
+
+void AWizardCharacter::ResetControlledChaosBlastCompleted()
+{
+	bCanControlChaosBlast = true;
+	
+	bCurrentlySelecting = false;
+	bElementSelected = false;
+
+	GetWorldTimerManager().ClearTimer(ResetControlledChaosCooldown);
+	GetWorldTimerManager().ClearTimer(ControlledChaosChooseElementTimerHandle);
+}
+
+// End Controlled Chaos Attack
 // TF right click - cone
 //shift is teleport
 //r random meteors

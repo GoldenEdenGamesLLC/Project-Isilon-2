@@ -22,6 +22,16 @@ FGameplayTag UGameplayAbilitySystemLibrary::GetRandomTagFromContainer(const FGam
     return Container.GetByIndex(RandomIndex);
 }
 
+FGameplayTag UGameplayAbilitySystemLibrary::GetSpecificTagFromContainer(const FGameplayTagContainer& Container, const uint8& ChosenIndex)
+{
+    if(Container.IsEmpty())
+    {
+        return FGameplayTag::EmptyTag;
+    }
+
+    return Container.GetByIndex(ChosenIndex - 1);
+}
+
 FGameplayTagContainer UGameplayAbilitySystemLibrary::GetAllChildrenTagsOfCategories(const FGameplayTagContainer &CategoryTags)
 {
     FGameplayTagContainer AllChildrenTags;

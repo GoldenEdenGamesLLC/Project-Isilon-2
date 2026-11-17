@@ -64,18 +64,21 @@ private:
 	// Wizard Chaos Bolt
 	// ===========================================
 	
+	uint8 ElementalDamageType = 0;
+
 	bool bCanBasicAttack = true;
 	FTimerHandle BasicAttackCooldownTimerHandle;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
-	float BasicAttackSpeed = 1.0f;
+	// float BasicAttackSpeed = 1.0f;
+	float BasicAttackSpeed = 0.33f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
 	float BasicAttackDamage = 125.0f;
 
 	// Chaos damage: each basic attack picks one of these damage types at random
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack", meta = (Categories = "Combat.DamageType"))
-	FGameplayTagContainer BasicAttackDamageTypes;
+	FGameplayTagContainer ElementalBasicAttackDamageTypes;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
 	float BasicAttackHalfHeight = 50.0f;
@@ -96,10 +99,45 @@ private:
 	void ServerBasicAttack(FRotator AimRotation);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastBasicAttackFX(FVector Start, FVector End, bool bHit, uint8 ElementalDamageType);
+	void MulticastBasicAttackFX(FVector Start, FVector End, bool bHit);
 
 	void BasicAttackCompleted();
-		
+	
+	// ===========================================
+	// Wizard Controlled Chaos Blast
+	// ===========================================
+
+	bool bCanControlChaosBlast = true;
+	
+	bool bCurrentlySelecting = false;
+	bool bElementSelected = false;
+	uint8 CurrentElement = 0;
+	float ControlledChaosBlastNextElementTime = 0.55f;
+
+	FTimerHandle ResetControlledChaosCooldown;
+	FTimerHandle ControlledChaosChooseElementTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Controlled Chaos Blast")
+	uint8 ControlledChaosBlastElementalDamageType = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Controlled Chaos Blast")
+	float ControlledChaosBlastCooldown = 8.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Controlled Chaos Blast")
+	float ControlledChaosBlastEndDistance = 600.0f;
+
+	void ControlledChaosBlastPressed();
+
+	void SelectingElement();
+
+	//UFUNCTION(Server, Reliable)
+	void ConeExplosion();
+
+	UFUNCTION(Server, Reliable)
+	void ServerPerformControlledChaosBlast();
+
+	void ResetControlledChaosBlastCompleted();
+
 	// ===========================================
 	// Stats
 	// ===========================================
@@ -146,7 +184,7 @@ private:
 	TObjectPtr<UInputAction> IA_Ultimate;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputAction> IA_Utility;
+	TObjectPtr<UInputAction> IA_ControlledChaos;
 
 	void Move(const FInputActionValue& val);
 	void Look(const FInputActionValue& val);
