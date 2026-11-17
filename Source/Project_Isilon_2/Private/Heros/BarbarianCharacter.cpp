@@ -173,7 +173,7 @@ void ABarbarianCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ABarbarianCharacter::StopJumping);
 		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &ABarbarianCharacter::InteractWithObject);
 		
-		// ASC Implementation
+		//Ability Implementation
 		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &ABarbarianCharacter::DashPressed);
 		EnhancedInputComponent->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &ABarbarianCharacter::BasicAttackPressed);
 		EnhancedInputComponent->BindAction(IA_Massacre, ETriggerEvent::Started, this, &ABarbarianCharacter::MassacrePressed);

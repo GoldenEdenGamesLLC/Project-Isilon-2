@@ -21,6 +21,9 @@ public:
 	static FGameplayTag GetRandomTagFromContainer(const FGameplayTagContainer& Container);
 
 	UFUNCTION(BlueprintCallable)
+	static FGameplayTag GetSpecificTagFromContainer(const FGameplayTagContainer& Container, const uint8& ChosenIndex);
+
+	UFUNCTION(BlueprintCallable)
 	static FGameplayTagContainer GetAllChildrenTagsOfCategories(const FGameplayTagContainer& CategoryTags);
 
 	UFUNCTION(BlueprintPure)
