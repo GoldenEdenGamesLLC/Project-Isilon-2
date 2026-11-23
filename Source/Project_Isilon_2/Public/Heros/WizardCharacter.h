@@ -18,6 +18,33 @@ class ACharacter;
 struct FInputActionInstance;
 struct FInputActionValue;
 
+// Per-enemy state for Cone Explosion elemental effects
+struct FWizardBurnData
+{
+	int32 Stacks = 0;
+	int32 TicksRemaining = 0;
+	FTimerHandle TimerHandle;
+};
+
+struct FWizardShockData
+{
+	int32 Stacks = 0;
+	FTimerHandle StackTimerHandle;
+};
+
+struct FWizardChillData
+{
+	int32 Stacks = 0;
+	float OriginalMaxWalkSpeed = 0.0f;
+	FTimerHandle StackTimerHandle;
+};
+
+struct FWizardRootData
+{
+	float OriginalMaxWalkSpeed = 0.0f;
+	FTimerHandle TimerHandle;
+};
+
 UCLASS()
 class PROJECT_ISILON_2_API AWizardCharacter : public AHeroCharacterBase
 {
@@ -42,6 +69,8 @@ protected:
 	virtual void OnJumped_Implementation() override;
 	virtual void Landed(const FHitResult& Hit) override;
 	
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	//replicated overrides
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -74,7 +103,7 @@ private:
 	float BasicAttackSpeed = 0.33f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack")
-	float BasicAttackDamage = 125.0f;
+	float BasicAttackDamage = 27.5f; //base damage
 
 	// Chaos damage: each basic attack picks one of these damage types at random
 	UPROPERTY(EditDefaultsOnly, Category = "Basic Attack", meta = (Categories = "Combat.DamageType"))
@@ -137,6 +166,104 @@ private:
 	void ServerPerformControlledChaosBlast();
 
 	void ResetControlledChaosBlastCompleted();
+
+	// ===========================================
+	// Wizard Cone Explosion
+	// ===========================================
+
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion")
+	float ConeExplosionDamage = 30.0f;
+
+	// circle around the wizard where the cone starts, hits enemies hugging you
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion")
+	float ConeExplosionInnerRadius = 150.0f;
+
+	// full width of the cone in degrees
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion", meta = (ClampMin = "1.0", ClampMax = "180.0"))
+	float ConeExplosionAngle = 60.0f;
+
+	// Frost - each stack slows more, at max stacks the target is rooted
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Frost", meta = (ClampMin = "1"))
+	int32 MaxFrostStacks = 20;
+
+	// move speed lost per stack (0.04 = 4% per stack)
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Frost", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float FrostSlowPerStack = 0.04f;
+
+	// slow never goes past this before the root kicks in
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Frost", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float FrostMaxSlow = 0.9f;
+
+	// stacks fall off if not reapplied within this time
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Frost")
+	float FrostStackDuration = 10.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Frost")
+	float RootDuration = 2.0f;
+
+	// Lightning - builds stacks, on max stacks deals damage and stuns
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Lightning", meta = (ClampMin = "1"))
+	int32 MaxLightningStacks = 10;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Lightning")
+	float LightningStackDuration = 10.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Lightning")
+	float LightningOverloadDamage = 150.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Lightning")
+	float StunDuration = 1.5f;
+
+	// Fire - each application adds a stack, burn damage per tick = stacks * damage per stack
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Fire", meta = (ClampMin = "1", ClampMax = "255"))
+	int32 MaxBurnStacks = 255;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Fire")
+	float BurnDamagePerStack = 3.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Fire")
+	float BurnTickInterval = 0.5f;
+
+	// reapplying refreshes the duration back to this many ticks
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Fire")
+	int32 BurnTickCount = 6;
+
+	// Celestial
+	UPROPERTY(EditDefaultsOnly, Category = "Cone Explosion|Celestial", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float CelestialDamageMultiplicationStrength = 2.0f;
+
+	TMap<TWeakObjectPtr<AActor>, FWizardBurnData> BurningEnemies;
+	TMap<TWeakObjectPtr<ACharacter>, FWizardShockData> ShockedEnemies;
+	TMap<TWeakObjectPtr<ACharacter>, FTimerHandle> StunnedEnemies;
+	TMap<TWeakObjectPtr<ACharacter>, FWizardChillData> ChilledEnemies;
+	TMap<TWeakObjectPtr<ACharacter>, FWizardRootData> RootedEnemies;
+
+	bool IsInConeExplosion(const FVector& Origin, const FVector& ConeDirection, const FVector& EnemyLocation) const;
+	void ApplyConeExplosionEffect(AActor* EnemyActor, const FGameplayTag& DamageType);
+	void ApplyElementalStacks(AActor* EnemyActor, const FGameplayTag& DamageType);
+
+	// Lightning
+	void ApplyShock(ACharacter* EnemyCharacter);
+	void ExpireShockStacks(TWeakObjectPtr<ACharacter> EnemyCharacter);
+	void StunEnemy(ACharacter* EnemyCharacter);
+	void EndStun(TWeakObjectPtr<ACharacter> EnemyCharacter);
+
+	// Frost
+	void ApplyChill(ACharacter* EnemyCharacter);
+	void ExpireChillStacks(TWeakObjectPtr<ACharacter> EnemyCharacter);
+	void RootEnemy(ACharacter* EnemyCharacter, float OriginalMaxWalkSpeed);
+	void EndRoot(TWeakObjectPtr<ACharacter> EnemyCharacter);
+
+	// Fire
+	void ApplyBurn(AActor* EnemyActor);
+	void TickBurn(TWeakObjectPtr<AActor> EnemyActor);
+
+	void DealMultipliedDamage(AActor* EnemyActor);
+
+	void ClearConeExplosionEffects();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastConeExplosionFX(FVector Origin, FVector ConeDirection, FColor ElementColor);
 
 	// ===========================================
 	// Stats

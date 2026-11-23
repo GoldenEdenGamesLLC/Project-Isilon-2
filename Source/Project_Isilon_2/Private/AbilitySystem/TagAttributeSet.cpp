@@ -19,6 +19,7 @@ UTagAttributeSet::UTagAttributeSet()
 	InitLightningResistance(0.0f);
 	InitFireResistance(0.0f);
 	InitFrostResistance(0.0f);
+	InitCelestialResistance(0.0f);
 	InitPoisonResistance(0.0f);
 	InitIncomingDamage(0.0f);
 }
@@ -37,6 +38,7 @@ void UTagAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, LightningResistance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, FireResistance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, FrostResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, CelestialResistance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTagAttributeSet, PoisonResistance, COND_None, REPNOTIFY_Always);
 }
 
@@ -137,6 +139,11 @@ void UTagAttributeSet::OnRep_FireResistance(const FGameplayAttributeData& OldVal
 void UTagAttributeSet::OnRep_FrostResistance(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UTagAttributeSet, FrostResistance, OldValue);
+}
+
+void UTagAttributeSet::OnRep_CelestialResistance(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UTagAttributeSet, CelestialResistance, OldValue);
 }
 
 void UTagAttributeSet::OnRep_PoisonResistance(const FGameplayAttributeData& OldValue)

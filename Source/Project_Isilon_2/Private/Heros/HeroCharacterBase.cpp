@@ -136,7 +136,11 @@ bool AHeroCharacterBase::DealDamage(AActor* Target, float Amount, const FGamepla
 		return false;
 	}
 
+	UE_LOG(LogTemp, Error, TEXT("DAMAGE DONE = %f"), Amount);
+
 	TMap<FGameplayTag, float> DamageByType;
+	//TODO
+	//make damage types be affected by spell power if it uses spell power and attack power if not.
 	DamageByType.Add(DamageType, Amount);
 
 	return UGameplayAbilitySystemLibrary::ApplyGASDamage(Target, this, GetController(), DamageByType);

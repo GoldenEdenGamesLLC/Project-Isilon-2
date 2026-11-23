@@ -15,6 +15,7 @@ namespace GameplayTags::Combat
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(Lightning);
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(Fire);
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(Frost);
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Celestial);
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(Poison);
     }
 }

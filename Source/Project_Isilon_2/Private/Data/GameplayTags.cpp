@@ -12,6 +12,7 @@ namespace GameplayTags::Combat
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Lightning, "Combat.DamageType.Lightning", "Lightning damage");
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Fire, "Combat.DamageType.Fire", "Fire damage");
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Frost, "Combat.DamageType.Frost", "Frost damage");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Celestial, "Combat.DamageType.Celestial", "Celestial damage");
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Poison, "Combat.DamageType.Poison", "Poison damage");
     }
 }

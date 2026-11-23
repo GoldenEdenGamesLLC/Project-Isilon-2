@@ -86,6 +86,10 @@ public:
 	FGameplayAttributeData FrostResistance;
 	ATTRIBUTE_ACCESSORS(UTagAttributeSet, FrostResistance)
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_CelestialResistance, Category = "Defense")
+	FGameplayAttributeData CelestialResistance;
+	ATTRIBUTE_ACCESSORS(UTagAttributeSet, CelestialResistance)
+
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_PoisonResistance, Category = "Defense")
 	FGameplayAttributeData PoisonResistance;
 	ATTRIBUTE_ACCESSORS(UTagAttributeSet, PoisonResistance)
@@ -128,6 +132,9 @@ protected:
 
 	UFUNCTION()
 	void OnRep_FrostResistance(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_CelestialResistance(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
 	void OnRep_PoisonResistance(const FGameplayAttributeData& OldValue);

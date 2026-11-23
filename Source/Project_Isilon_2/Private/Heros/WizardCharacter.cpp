@@ -10,6 +10,11 @@
 #include "Heros/InteractableActor.h"
 #include "Data/GameplayTags.h"
 #include "Libraries/GameplayAbilitySystemLibrary.h"
+#include "Interfaces/EnemyInterface.h"
+#include "Enemies/EnemyAIController.h"
+#include "AbilitySystem/TagAttributeSet.h"
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -39,7 +44,7 @@ AWizardCharacter::AWizardCharacter()
 	ElementalBasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Lightning);
 	ElementalBasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Fire);
 	ElementalBasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Frost);
-	ElementalBasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Poison);
+	ElementalBasicAttackDamageTypes.AddTag(GameplayTags::Combat::DamageTypes::Celestial);
 
 	//spring arm
 	cameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -93,6 +98,17 @@ void AWizardCharacter::BeginPlay()
 	
 	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AWizardCharacter::OnInteractionSphereBeginOverlap);
 	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AWizardCharacter::OnInteractionSphereEndOverlap);
+}
+
+void AWizardCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	//don't leave enemies frozen/slowed forever if the wizard goes away
+	if(HasAuthority())
+	{
+		ClearConeExplosionEffects();
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 // Called every frame
@@ -481,9 +497,28 @@ void AWizardCharacter::PerformBasicAttack(FRotator AimRotation)
 			if(HitActor)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("[SERVER] Basic Attack Hit: %s"), *HitActor->GetName());
-				damagedActors.Add(HitActor);
 
-				DealDamage(HitActor, BasicAttackDamage, DamageType);
+				bool bAlreadyHit = false;
+				damagedActors.Add(HitActor, &bAlreadyHit);
+
+				if(DamageType == GameplayTags::Combat::DamageTypes::Celestial)
+				{
+					DealDamage(HitActor, BasicAttackDamage * CelestialDamageMultiplicationStrength, DamageType);
+				}
+				else
+				{
+					DealDamage(HitActor, BasicAttackDamage, DamageType);
+				}
+
+				//elemental stacks, once per enemy per attack
+				if(!bAlreadyHit && HitActor->Implements<UEnemyInterface>() && IEnemyInterface::Execute_IsEnemyActive(HitActor))
+				{
+					AActor* EnemyActor = IEnemyInterface::Execute_GetEnemyActor(HitActor);
+					if(IsValid(EnemyActor))
+					{
+						ApplyElementalStacks(EnemyActor, DamageType);
+					}
+				}
 			}
 		}
 	}
@@ -494,6 +529,7 @@ void AWizardCharacter::PerformBasicAttack(FRotator AimRotation)
 	if(DamageType == GameplayTags::Combat::DamageTypes::Lightning)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Lightning."));
+		
 		ElementalDamageType = 0;
 	}
 	else if(DamageType == GameplayTags::Combat::DamageTypes::Fire)
@@ -506,9 +542,9 @@ void AWizardCharacter::PerformBasicAttack(FRotator AimRotation)
 		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Frost."));
 		ElementalDamageType = 2;
 	}
-	else if(DamageType == GameplayTags::Combat::DamageTypes::Poison)
+	else if(DamageType == GameplayTags::Combat::DamageTypes::Celestial)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Poison."));
+		UE_LOG(LogTemp, Warning, TEXT("[WIZARD BASIC ATTACK] Damage Type = Celestial."));
 		ElementalDamageType = 3;
 	}
 
@@ -519,7 +555,7 @@ void AWizardCharacter::PerformBasicAttack(FRotator AimRotation)
 
 void AWizardCharacter::MulticastBasicAttackFX_Implementation(FVector Start, FVector End, bool bHit)
 {
-	FColor ElementalType = FColor::Red;
+	FColor ElementalType = FColor::White;
 
 	const float ColorVariant = FMath::FRandRange(-2.5f, 2.5f);
 	// UE_LOG(LogTemp, Warning, TEXT("Color Variant Percentage : %f"), ColorVariant);
@@ -538,8 +574,8 @@ void AWizardCharacter::MulticastBasicAttackFX_Implementation(FVector Start, FVec
 			ElementalType = FColor(61 + ColorVariant, 169 + ColorVariant, 253 + ColorVariant);
 			
 			break;
-		case 3: //poison
-			ElementalType = FColor(96 + ColorVariant, 181 + ColorVariant, 102 + ColorVariant);
+		case 3: //Celestial
+			ElementalType = FColor(140 + ColorVariant, 71 + ColorVariant, 67 + ColorVariant);
 			
 			break;
 		default:
@@ -607,12 +643,455 @@ void AWizardCharacter::ServerPerformControlledChaosBlast_Implementation()
 
 void AWizardCharacter::ConeExplosion()
 {
-	//explosion math
-
-	//do sphere size of barbarian aa
-	//then do cone outside of that
+	if(!HasAuthority())
+	{
+		return;
+	}
 
 	GetWorldTimerManager().SetTimer(ResetControlledChaosCooldown, this, &AWizardCharacter::ResetControlledChaosBlastCompleted, ControlledChaosBlastCooldown, false);
+
+	//same index lookup as basic attack (index is 1 based)
+	const FGameplayTag DamageType = UGameplayAbilitySystemLibrary::GetSpecificTagFromContainer(ElementalBasicAttackDamageTypes, ControlledChaosBlastElementalDamageType);
+
+	//aim with the camera yaw, flat on the ground
+	const FRotator ControlRot = Controller ? Controller->GetControlRotation() : GetActorRotation();
+	const FRotator YawRotation(0.0f, ControlRot.Yaw, 0.0f);
+	const FVector ConeDirection = YawRotation.Vector();
+	const FVector Origin = GetActorLocation();
+
+	SetActorRotation(YawRotation);
+
+	//grab everything that could be inside the cone, then filter by inner circle / cone angle
+	TArray<FOverlapResult> OverlapResults;
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	FCollisionObjectQueryParams ObjectParams;
+	ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
+
+	const FCollisionShape ExplosionSphere = FCollisionShape::MakeSphere(ControlledChaosBlastEndDistance);
+	GetWorld()->OverlapMultiByObjectType(OverlapResults, Origin, FQuat::Identity, ObjectParams, ExplosionSphere, QueryParams);
+
+	//enemies can have multiple components overlapping
+	TSet<AActor*> HitEnemies;
+
+	for(const FOverlapResult& OverlapHits : OverlapResults)
+	{
+		AActor* HitActor = OverlapHits.GetActor();
+
+		if(!IsValid(HitActor))
+		{
+			continue;
+		}
+
+		if(!HitActor->Implements<UEnemyInterface>())
+		{
+			continue;
+		}
+
+		if(!IEnemyInterface::Execute_IsEnemyActive(HitActor))
+		{
+			continue;
+		}
+
+		AActor* EnemyActor = IEnemyInterface::Execute_GetEnemyActor(HitActor);
+		if(!IsValid(EnemyActor) || HitEnemies.Contains(EnemyActor))
+		{
+			continue;
+		}
+
+		if(!IsInConeExplosion(Origin, ConeDirection, EnemyActor->GetActorLocation()))
+		{
+			continue;
+		}
+
+		HitEnemies.Add(EnemyActor);
+		UE_LOG(LogTemp, Warning, TEXT("[WIZARD CONE EXPLOSION] Hit %s"), *EnemyActor->GetName());
+
+		DealDamage(EnemyActor, ConeExplosionDamage, DamageType);
+		ApplyConeExplosionEffect(EnemyActor, DamageType);
+	}
+
+	FColor ElementColor = FColor::White;
+	if(DamageType == GameplayTags::Combat::DamageTypes::Lightning)
+	{
+		ElementColor = FColor(39, 224, 245);
+	}
+	else if(DamageType == GameplayTags::Combat::DamageTypes::Fire)
+	{
+		ElementColor = FColor(245, 87, 39);
+	}
+	else if(DamageType == GameplayTags::Combat::DamageTypes::Frost)
+	{
+		ElementColor = FColor(61, 169, 253);
+	}
+	else if(DamageType == GameplayTags::Combat::DamageTypes::Celestial)
+	{
+		ElementColor = FColor(140, 71, 67);
+	}
+
+	MulticastConeExplosionFX(Origin, ConeDirection, ElementColor);
+}
+
+bool AWizardCharacter::IsInConeExplosion(const FVector& Origin, const FVector& ConeDirection, const FVector& EnemyLocation) const
+{
+	//flatten so enemies above/below still count
+	FVector ToEnemy = EnemyLocation - Origin;
+	ToEnemy.Z = 0.0f;
+
+	const float DistanceSquared = ToEnemy.SizeSquared();
+
+	//inner circle where the cone starts
+	if(DistanceSquared <= FMath::Square(ConeExplosionInnerRadius))
+	{
+		return true;
+	}
+
+	if(DistanceSquared > FMath::Square(ControlledChaosBlastEndDistance))
+	{
+		return false;
+	}
+
+	//cone: angle between aim and enemy must be within half the cone width
+	const float HalfAngleCos = FMath::Cos(FMath::DegreesToRadians(ConeExplosionAngle * 0.5f));
+	const float Dot = FVector::DotProduct(ConeDirection.GetSafeNormal2D(), ToEnemy.GetSafeNormal());
+
+	return Dot >= HalfAngleCos;
+}
+
+void AWizardCharacter::ApplyConeExplosionEffect(AActor* EnemyActor, const FGameplayTag& DamageType)
+{
+	if(DamageType == GameplayTags::Combat::DamageTypes::Celestial)
+	{
+		DealMultipliedDamage(EnemyActor);
+		return;
+	}
+
+	ApplyElementalStacks(EnemyActor, DamageType);
+}
+
+// shared by basic attack and cone explosion
+void AWizardCharacter::ApplyElementalStacks(AActor* EnemyActor, const FGameplayTag& DamageType)
+{
+	if(DamageType == GameplayTags::Combat::DamageTypes::Frost)
+	{
+		ApplyChill(Cast<ACharacter>(EnemyActor));
+	}
+	else if(DamageType == GameplayTags::Combat::DamageTypes::Lightning)
+	{
+		ApplyShock(Cast<ACharacter>(EnemyActor));
+	}
+	else if(DamageType == GameplayTags::Combat::DamageTypes::Fire)
+	{
+		ApplyBurn(EnemyActor);
+	}
+}
+
+// Lightning - stacks, on max stacks deal damage and stun
+void AWizardCharacter::ApplyShock(ACharacter* EnemyCharacter)
+{
+	if(!IsValid(EnemyCharacter))
+	{
+		return;
+	}
+
+	//no building stacks while already stunned
+	if(StunnedEnemies.Contains(EnemyCharacter))
+	{
+		return;
+	}
+
+	FWizardShockData& ShockData = ShockedEnemies.FindOrAdd(EnemyCharacter);
+	ShockData.Stacks++;
+
+	UE_LOG(LogTemp, Warning, TEXT("[WIZARD LIGHTNING] %s stacks = %d"), *EnemyCharacter->GetName(), ShockData.Stacks);
+
+	if(ShockData.Stacks >= MaxLightningStacks)
+	{
+		GetWorldTimerManager().ClearTimer(ShockData.StackTimerHandle);
+		ShockedEnemies.Remove(EnemyCharacter);
+
+		DealDamage(EnemyCharacter, LightningOverloadDamage, GameplayTags::Combat::DamageTypes::Lightning);
+
+		//overload damage might have killed it
+		if(IEnemyInterface::Execute_IsEnemyActive(EnemyCharacter))
+		{
+			StunEnemy(EnemyCharacter);
+		}
+		return;
+	}
+
+	//refresh stack duration
+	const FTimerDelegate ExpireDelegate = FTimerDelegate::CreateUObject(this, &AWizardCharacter::ExpireShockStacks, TWeakObjectPtr<ACharacter>(EnemyCharacter));
+	GetWorldTimerManager().SetTimer(ShockData.StackTimerHandle, ExpireDelegate, LightningStackDuration, false);
+}
+
+void AWizardCharacter::ExpireShockStacks(TWeakObjectPtr<ACharacter> EnemyCharacter)
+{
+	ShockedEnemies.Remove(EnemyCharacter);
+}
+
+void AWizardCharacter::StunEnemy(ACharacter* EnemyCharacter)
+{
+	FTimerHandle& StunHandle = StunnedEnemies.FindOrAdd(EnemyCharacter);
+
+	if(AEnemyAIController* AIController = Cast<AEnemyAIController>(EnemyCharacter->GetController()))
+	{
+		AIController->SetCrowdControlActive(true);
+	}
+
+	if(UCharacterMovementComponent* Movement = EnemyCharacter->GetCharacterMovement())
+	{
+		Movement->StopMovementImmediately();
+		Movement->DisableMovement();
+	}
+
+	const FTimerDelegate EndStunDelegate = FTimerDelegate::CreateUObject(this, &AWizardCharacter::EndStun, TWeakObjectPtr<ACharacter>(EnemyCharacter));
+	GetWorldTimerManager().SetTimer(StunHandle, EndStunDelegate, StunDuration, false);
+}
+
+void AWizardCharacter::EndStun(TWeakObjectPtr<ACharacter> EnemyCharacter)
+{
+	StunnedEnemies.Remove(EnemyCharacter);
+
+	if(!EnemyCharacter.IsValid())
+	{
+		return;
+	}
+
+	if(UCharacterMovementComponent* Movement = EnemyCharacter->GetCharacterMovement())
+	{
+		Movement->SetMovementMode(MOVE_Walking);
+	}
+
+	if(AEnemyAIController* AIController = Cast<AEnemyAIController>(EnemyCharacter->GetController()))
+	{
+		AIController->SetCrowdControlActive(false);
+	}
+}
+
+// Frost - each stack slows more, on max stacks root
+void AWizardCharacter::ApplyChill(ACharacter* EnemyCharacter)
+{
+	if(!IsValid(EnemyCharacter))
+	{
+		return;
+	}
+
+	//already rooted, its walk speed is 0 so don't start stacking off of that
+	if(RootedEnemies.Contains(EnemyCharacter))
+	{
+		return;
+	}
+
+	UCharacterMovementComponent* Movement = EnemyCharacter->GetCharacterMovement();
+	if(!Movement)
+	{
+		return;
+	}
+
+	//store the original speed on the first stack only
+	FWizardChillData* ChillData = ChilledEnemies.Find(EnemyCharacter);
+	if(!ChillData)
+	{
+		ChillData = &ChilledEnemies.Add(EnemyCharacter);
+		ChillData->OriginalMaxWalkSpeed = Movement->MaxWalkSpeed;
+	}
+
+	ChillData->Stacks++;
+
+	UE_LOG(LogTemp, Warning, TEXT("[WIZARD FROST] %s stacks = %d"), *EnemyCharacter->GetName(), ChillData->Stacks);
+
+	if(ChillData->Stacks >= MaxFrostStacks)
+	{
+		const float OriginalSpeed = ChillData->OriginalMaxWalkSpeed;
+
+		GetWorldTimerManager().ClearTimer(ChillData->StackTimerHandle);
+		ChilledEnemies.Remove(EnemyCharacter);
+
+		RootEnemy(EnemyCharacter, OriginalSpeed);
+		return;
+	}
+
+	const float SlowPercent = FMath::Min(ChillData->Stacks * FrostSlowPerStack, FrostMaxSlow);
+	Movement->MaxWalkSpeed = ChillData->OriginalMaxWalkSpeed * (1.0f - SlowPercent);
+
+	//refresh stack duration
+	const FTimerDelegate ExpireDelegate = FTimerDelegate::CreateUObject(this, &AWizardCharacter::ExpireChillStacks, TWeakObjectPtr<ACharacter>(EnemyCharacter));
+	GetWorldTimerManager().SetTimer(ChillData->StackTimerHandle, ExpireDelegate, FrostStackDuration, false);
+}
+
+void AWizardCharacter::ExpireChillStacks(TWeakObjectPtr<ACharacter> EnemyCharacter)
+{
+	FWizardChillData ChillData;
+	if(!ChilledEnemies.RemoveAndCopyValue(EnemyCharacter, ChillData))
+	{
+		return;
+	}
+
+	if(!EnemyCharacter.IsValid())
+	{
+		return;
+	}
+
+	if(UCharacterMovementComponent* Movement = EnemyCharacter->GetCharacterMovement())
+	{
+		Movement->MaxWalkSpeed = ChillData.OriginalMaxWalkSpeed;
+	}
+}
+
+void AWizardCharacter::RootEnemy(ACharacter* EnemyCharacter, float OriginalMaxWalkSpeed)
+{
+	UE_LOG(LogTemp, Warning, TEXT("[WIZARD FROST] Rooted %s"), *EnemyCharacter->GetName());
+
+	//root = can't move but can still attack if in range (stun stops both)
+	if(UCharacterMovementComponent* Movement = EnemyCharacter->GetCharacterMovement())
+	{
+		Movement->StopMovementImmediately();
+		Movement->MaxWalkSpeed = 0.0f;
+	}
+
+	FWizardRootData& RootData = RootedEnemies.FindOrAdd(EnemyCharacter);
+	RootData.OriginalMaxWalkSpeed = OriginalMaxWalkSpeed;
+
+	const FTimerDelegate EndRootDelegate = FTimerDelegate::CreateUObject(this, &AWizardCharacter::EndRoot, TWeakObjectPtr<ACharacter>(EnemyCharacter));
+	GetWorldTimerManager().SetTimer(RootData.TimerHandle, EndRootDelegate, RootDuration, false);
+}
+
+void AWizardCharacter::EndRoot(TWeakObjectPtr<ACharacter> EnemyCharacter)
+{
+	FWizardRootData RootData;
+	if(!RootedEnemies.RemoveAndCopyValue(EnemyCharacter, RootData))
+	{
+		return;
+	}
+
+	if(!EnemyCharacter.IsValid())
+	{
+		return;
+	}
+
+	if(UCharacterMovementComponent* Movement = EnemyCharacter->GetCharacterMovement())
+	{
+		Movement->MaxWalkSpeed = RootData.OriginalMaxWalkSpeed;
+	}
+}
+
+// Fire - stacking burn
+void AWizardCharacter::ApplyBurn(AActor* EnemyActor)
+{
+	if(!IsValid(EnemyActor))
+	{
+		return;
+	}
+
+	//every application adds a stack and refreshes the duration
+	FWizardBurnData& BurnData = BurningEnemies.FindOrAdd(EnemyActor);
+	BurnData.Stacks = FMath::Min(BurnData.Stacks + 1, MaxBurnStacks);
+	BurnData.TicksRemaining = BurnTickCount;
+
+	UE_LOG(LogTemp, Warning, TEXT("[WIZARD FIRE] %s stacks = %d"), *EnemyActor->GetName(), BurnData.Stacks);
+
+	if(!GetWorldTimerManager().IsTimerActive(BurnData.TimerHandle))
+	{
+		const FTimerDelegate BurnDelegate = FTimerDelegate::CreateUObject(this, &AWizardCharacter::TickBurn, TWeakObjectPtr<AActor>(EnemyActor));
+		GetWorldTimerManager().SetTimer(BurnData.TimerHandle, BurnDelegate, BurnTickInterval, true);
+	}
+}
+
+void AWizardCharacter::TickBurn(TWeakObjectPtr<AActor> EnemyActor)
+{
+	FWizardBurnData* BurnData = BurningEnemies.Find(EnemyActor);
+	if(!BurnData)
+	{
+		return;
+	}
+
+	//enemy died / went back to the pool
+	const bool bEnemyActive = EnemyActor.IsValid()
+		&& EnemyActor->Implements<UEnemyInterface>()
+		&& IEnemyInterface::Execute_IsEnemyActive(EnemyActor.Get());
+
+	//burn ran out, stacks are lost
+	if(!bEnemyActive || BurnData->TicksRemaining <= 0)
+	{
+		GetWorldTimerManager().ClearTimer(BurnData->TimerHandle);
+		BurningEnemies.Remove(EnemyActor);
+		return;
+	}
+
+	BurnData->TicksRemaining--;
+	DealDamage(EnemyActor.Get(), BurnDamagePerStack * BurnData->Stacks, GameplayTags::Combat::DamageTypes::Fire);
+}
+
+// Celestial - Deal Multiplied Damage
+void AWizardCharacter::DealMultipliedDamage(AActor* EnemyActor)
+{
+	UAbilitySystemComponent* EnemyASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(EnemyActor);
+	if(!EnemyASC)
+	{
+		return;
+	}
+
+	const float Health = EnemyASC->GetNumericAttribute(UTagAttributeSet::GetHealthAttribute());
+	const float EnemyMaxHealth = EnemyASC->GetNumericAttribute(UTagAttributeSet::GetMaxHealthAttribute());
+
+	//already dead from the explosion damage
+	if(Health <= 0.0f || EnemyMaxHealth <= 0.0f)
+	{
+		return;
+	}
+
+	//deals damage once again
+	DealDamage(EnemyActor, ConeExplosionDamage,GameplayTags::Combat::DamageTypes::Celestial);
+}
+
+void AWizardCharacter::ClearConeExplosionEffects()
+{
+	TArray<TWeakObjectPtr<ACharacter>> StunnedKeys;
+	StunnedEnemies.GetKeys(StunnedKeys);
+	for(const TWeakObjectPtr<ACharacter>& Enemy : StunnedKeys)
+	{
+		GetWorldTimerManager().ClearTimer(StunnedEnemies[Enemy]);
+		EndStun(Enemy);
+	}
+
+	TArray<TWeakObjectPtr<ACharacter>> RootedKeys;
+	RootedEnemies.GetKeys(RootedKeys);
+	for(const TWeakObjectPtr<ACharacter>& Enemy : RootedKeys)
+	{
+		GetWorldTimerManager().ClearTimer(RootedEnemies[Enemy].TimerHandle);
+		EndRoot(Enemy);
+	}
+
+	TArray<TWeakObjectPtr<ACharacter>> ChilledKeys;
+	ChilledEnemies.GetKeys(ChilledKeys);
+	for(const TWeakObjectPtr<ACharacter>& Enemy : ChilledKeys)
+	{
+		GetWorldTimerManager().ClearTimer(ChilledEnemies[Enemy].StackTimerHandle);
+		ExpireChillStacks(Enemy);
+	}
+
+	for(TPair<TWeakObjectPtr<ACharacter>, FWizardShockData>& Shock : ShockedEnemies)
+	{
+		GetWorldTimerManager().ClearTimer(Shock.Value.StackTimerHandle);
+	}
+	ShockedEnemies.Empty();
+
+	for(TPair<TWeakObjectPtr<AActor>, FWizardBurnData>& Burn : BurningEnemies)
+	{
+		GetWorldTimerManager().ClearTimer(Burn.Value.TimerHandle);
+	}
+	BurningEnemies.Empty();
+}
+
+void AWizardCharacter::MulticastConeExplosionFX_Implementation(FVector Origin, FVector ConeDirection, FColor ElementColor)
+{
+	DrawDebugCircle(GetWorld(), Origin, ConeExplosionInnerRadius, 32, FColor::Yellow, false, 1.0f, 0, 2.0f, FVector(1.0f, 0.0f, 0.0f), FVector(0.0f, 1.0f, 0.0f), false);
+
+	const float HalfAngleRadians = FMath::DegreesToRadians(ConeExplosionAngle * 0.75f);
+	DrawDebugCone(GetWorld(), Origin, ConeDirection, ControlledChaosBlastEndDistance, HalfAngleRadians, FMath::DegreesToRadians(15.0f), 16, ElementColor, false, 1.0f);
 }
 
 void AWizardCharacter::SelectingElement()
@@ -643,6 +1122,6 @@ void AWizardCharacter::ResetControlledChaosBlastCompleted()
 }
 
 // End Controlled Chaos Attack
-// TF right click - cone
+
 //shift is teleport
 //r random meteors
